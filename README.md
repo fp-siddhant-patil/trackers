@@ -9,6 +9,7 @@ Browse on GitHub, or enable **Settings → Pages → Deploy from branch `main` /
 | Doc | Type | Status |
 |---|---|---|
 | [Jira Development Workflow](docs/jira-development-workflow/) | Process + flowchart | Active |
+| [Jira Workflow Prompt](docs/jira-development-workflow/PROMPT.md) | AI / setup prompt | Active |
 
 ## Add a new doc
 
