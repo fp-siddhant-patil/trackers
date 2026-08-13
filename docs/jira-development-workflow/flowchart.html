@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jira Workflow Flowchart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #07110d;
+      --panel: #102019;
+      --line: #2f4a3d;
+      --text: #e8f3ec;
+      --muted: #93b0a2;
+      --accent: #3dd68c;
+      --story: #6eb6ff;
+      --bug: #ffb070;
+      --fail: #ff8f7a;
+      --pass: #3dd68c;
+      --decision: #c9a0ff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: "Figtree", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse 70% 45% at 15% 0%, rgba(61, 214, 140, 0.18), transparent 55%),
+        radial-gradient(ellipse 50% 35% at 90% 8%, rgba(110, 182, 255, 0.12), transparent 50%),
+        var(--ink);
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 2rem 1rem 4rem;
+    }
+
+    header { text-align: center; margin-bottom: 1.25rem; }
+
+    h1 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: clamp(2rem, 5vw, 3.1rem);
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    h1 span { color: var(--accent); }
+
+    .lede {
+      margin: 0.75rem auto 0;
+      max-width: 36rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1.25rem 0 1.5rem;
+    }
+
+    .tab {
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--muted);
+      font: 600 0.9rem/1 "Figtree", sans-serif;
+      padding: 0.65rem 1rem;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .tab:hover { color: var(--text); border-color: var(--accent); }
+    .tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--ink);
+    }
+
+    .panel {
+      display: none;
+      background: rgba(10, 22, 17, 0.55);
+      border: 1px solid var(--line);
+      border-radius: 1.25rem;
+      padding: 1.25rem 0.75rem 1.75rem;
+      overflow-x: auto;
+    }
+
+    .panel.active { display: block; }
+
+    .flow-svg {
+      display: block;
+      width: 860px;
+      max-width: none;
+      margin: 0 auto;
+      height: auto;
+    }
+
+    .node-rect { fill: var(--panel); stroke: var(--line); stroke-width: 1.5; }
+    .node-todo { fill: #123226; stroke: var(--accent); stroke-width: 1.8; }
+    .node-story { fill: #132433; stroke: var(--story); stroke-width: 1.6; }
+    .node-bug { fill: #2a1f16; stroke: var(--bug); stroke-width: 1.6; }
+    .node-pass { fill: #123226; stroke: var(--pass); stroke-width: 1.6; }
+    .node-fail { fill: #2a1814; stroke: var(--fail); stroke-width: 1.6; }
+    .node-done { fill: #154433; stroke: var(--accent); stroke-width: 2; }
+    .node-backlog { fill: #0f2a20; stroke: rgba(61, 214, 140, 0.55); stroke-width: 1.8; }
+    .node-decision { fill: #1a2030; stroke: var(--decision); stroke-width: 1.8; }
+
+    .label {
+      fill: var(--text);
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      text-anchor: middle;
+    }
+
+    .sub {
+      fill: var(--muted);
+      font-family: "Figtree", sans-serif;
+      font-size: 12px;
+      text-anchor: middle;
+    }
+
+    .arrow { stroke: var(--accent); stroke-width: 2; fill: none; }
+    .arrow-fail { stroke: var(--fail); stroke-width: 2; fill: none; }
+    .arrow-decision { stroke: var(--decision); stroke-width: 2; fill: none; }
+
+    .edge-label {
+      fill: var(--muted);
+      font-family: "Figtree", sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      text-anchor: middle;
+    }
+
+    .edge-yes { fill: var(--pass); }
+    .edge-no { fill: var(--fail); }
+
+    .legend {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-top: 1.25rem;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .legend span {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0.35rem 0.7rem;
+      background: rgba(8, 17, 14, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Jira <span>Flowchart</span></h1>
+      <p class="lede">
+        All tickets start in the <strong style="color:var(--text)">Backlog</strong> as
+        <strong style="color:var(--accent)">To Do</strong>. Story has the full estimation path;
+        Bug skips to development. Both end at Done after Play Store monitoring.
+      </p>
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-target="story">Story</button>
+        <button class="tab" data-target="bug">Bug</button>
+        <button class="tab" data-target="both">Both</button>
+      </div>
+    </header>
+
+    <!-- STORY: full end-to-end -->
+    <section class="panel active" id="story" aria-label="Story flowchart">
+      <svg class="flow-svg" viewBox="0 0 860 1680" role="img" aria-label="Complete Story workflow flowchart">
+        <defs>
+          <marker id="arrowHead" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#3dd68c" />
+          </marker>
+          <marker id="arrowHeadFail" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#ff8f7a" />
+          </marker>
+          <marker id="arrowHeadDecision" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#c9a0ff" />
+          </marker>
+        </defs>
+
+        <!-- Backlog -->
+        <rect class="node-backlog" x="280" y="20" width="300" height="70" rx="16" />
+        <text class="label" x="430" y="50">Backlog</text>
+        <text class="sub" x="430" y="70">All To Do tasks live here</text>
+        <path class="arrow" marker-end="url(#arrowHead)" d="M430 90 L430 118" />
+
+        <!-- To Do -->
+        <rect class="node-todo" x="300" y="120" width="260" height="64" rx="10" />
+        <text class="label" x="430" y="147">To Do</text>
+        <text class="sub" x="430" y="166">PM</text>
+        <path class="arrow" marker-end="url(#arrowHead)" d="M430 184 L430 212" />
+
+        <!-- Ready for Estimation -->
+        <rect class="node-story" x="300" y="214" width="260" height="64" rx="10" />
+        <text class="label" x="430" y="241">Ready for Estimation</text>
+        <text class="sub" x="430" y="260">PM</text>
+        <path class="arrow" marker-end="url(#arrowHead)" d="M430 278 L430 306" />
+
+        <!-- Ready for Development -->
+        <rect class="node-story" x="300" y="308" width="260" height="64" rx="10" />
+        <text class="label" x="430" y="335">Ready for Development</text>
+        <text class="sub" x="430" y="354">Tech Lead</text>
+        <path class="arrow" marker-end="url(#arrowHead)" d="M430 372 L430 400" />
+
+        <!-- In Progress -->
+        <rect class="node-rect" x="300" y="402" width="260" height="64" rx="10" />
+        <text class="label" x="430" y="429">In Progress</text>
+        <text class="sub" x="430" y="448">Developer</text>
+        <path class="arrow" marker-end="url(#arrowHead)" d="M430 466 L430 494" />
+
+        <!-- Code Review -->
+        <rect class="node-rect" x="300" y="496" width="260" height="64" rx="10" />
+        <text class="label" x="430" y="523">Code Review</text>
+        <text class="sub" x="430" y="542">Developer · until merge</text>
+        <path class="arrow" marker-end="url(#arrowHead)" d="M430 560 L430 588" />
+
+        <!-- Dev Done -->
+        <rect class="node-rect" x="300" y="590" width="260" height="64" rx="10" />
+        <text class="label" x="430" y="617">Dev Done</text>
+        <text class="sub" x="430" y="636">Developer · after merge</text>
+        <path class="arrow" marker-end="url(#arrowHead)" d="M430 654 L430 682" />
+
+        <!-- Ready to QA -->
+        <rect class="node-rect" x="300" y="684" width="260" height="64" rx="10" />
+        <text class="label" x="430" y="711">Ready to QA</text>
+        <text class="sub" x="430" y="730">Tech Lead</text>
+        <path class="arrow" marker-end="url(#arrowHead)" d="M430 748 L430 776" />
+
+        <!-- QA In Progress -->
+        <rect class="node-rect" x="300" y="778" width="260" height="64" rx="10" />
+        <text class="label" x="430" y="805">QA In Progress</text>
+        <text class="sub" x="430" y="824">QA Lead / QA members</text>
+        <path class="arrow-decision" marker-end="url(#arrowHeadDecision)" d="M430 842 L430 888" />
+
+        <!-- Decision diamond -->
+        <polygon class="node-decision" points="430,900 500,970 430,1040 360,970" />
+        <text class="label" x="430" y="966">QA</text>
+        <text class="label" x="430" y="984">Result?</text>
+
+        <!-- YES path (complete to Done) -->
+        <path class="arrow" marker-end="url(#arrowHead)" d="M500 970 L620 970 L620 1008" />
+        <text class="edge-label edge-yes" x="560" y="958">YES / Passed</text>
+
+        <rect class="node-pass" x="490" y="1010" width="260" height="64" rx="10" />
+        <text class="label" x="620" y="1037">QA Passed</text>
+        <text class="sub" x="620" y="1056">QA</text>
+        <path class="arrow" marker-end="url(#arrowHead)" d="M620 1074 L620 1102" />
+
+        <rect class="node-rect" x="490" y="1104" width="260" height="64" rx="10" />
+        <text class="label" x="620" y="1131">Ready for Deployment</text>
+        <text class="sub" x="620" y="1150">Developer</text>
+        <path class="arrow" marker-end="url(#arrowHead)" d="M620 1168 L620 1196" />
+
+        <rect class="node-rect" x="490" y="1198" width="260" height="70" rx="10" />
+        <text class="label" x="620" y="1226">Production Monitoring</text>
+        <text class="sub" x="620" y="1246">Tech Lead · after Play Store</text>
+        <path class="arrow" marker-end="url(#arrowHead)" d="M620 1268 L620 1296" />
+
+        <rect class="node-done" x="510" y="1298" width="220" height="58" rx="29" />
+        <text class="label" x="620" y="1325">Done</text>
+        <text class="sub" x="620" y="1343">QA closes sprint item</text>
+
+        <!-- NO path (fail loop) -->
+        <path class="arrow-fail" marker-end="url(#arrowHeadFail)" d="M360 970 L180 970 L180 1008" />
+        <text class="edge-label edge-no" x="270" y="958">NO / Failed</text>
+
+        <rect class="node-fail" x="50" y="1010" width="260" height="64" rx="10" />
+        <text class="label" x="180" y="1037">QA Testing Failed</text>
+        <text class="sub" x="180" y="1056">QA</text>
+        <path class="arrow-fail" marker-end="url(#arrowHeadFail)" d="M180 1074 L180 1102" />
+
+        <rect class="node-rect" x="50" y="1104" width="260" height="64" rx="10" />
+        <text class="label" x="180" y="1131">In Progress</text>
+        <text class="sub" x="180" y="1150">Developer fixes</text>
+
+        <!-- Loop back indicator -->
+        <path class="arrow-fail" marker-end="url(#arrowHeadFail)" d="M50 1136 L24 1136 L24 434 L300 434" />
+        <text class="edge-label edge-no" x="24" y="780" transform="rotate(-90 24 780)">Fix loop back</text>
+        <text class="sub" x="150" y="1190">Then: Code Review → Dev Done</text>
+        <text class="sub" x="150" y="1208">→ Ready to QA → QA In Progress</text>
+      </svg>
+    </section>
+
+    <!-- BUG: same complete layout as Story (skips estimation) -->
+    <section class="panel" id="bug" aria-label="Bug flowchart">
+      <svg class="flow-svg" viewBox="0 0 860 1480" role="img" aria-label="Complete Bug workflow flowchart">
+        <defs>
+          <marker id="bugArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#3dd68c" />
+          </marker>
+          <marker id="bugArrowFail" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#ff8f7a" />
+          </marker>
+          <marker id="bugArrowDecision" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#c9a0ff" />
+          </marker>
+        </defs>
+
+        <!-- Backlog -->
+        <rect class="node-backlog" x="280" y="20" width="300" height="70" rx="16" />
+        <text class="label" x="430" y="50">Backlog</text>
+        <text class="sub" x="430" y="70">All To Do tasks live here</text>
+        <path class="arrow" marker-end="url(#bugArrow)" d="M430 90 L430 118" />
+
+        <!-- To Do -->
+        <rect class="node-todo" x="300" y="120" width="260" height="64" rx="10" />
+        <text class="label" x="430" y="147">To Do</text>
+        <text class="sub" x="430" y="166">Starts in Backlog</text>
+        <path class="arrow" marker-end="url(#bugArrow)" d="M430 184 L430 212" />
+
+        <!-- In Progress (bug skips estimation) -->
+        <rect class="node-bug" x="300" y="214" width="260" height="64" rx="10" />
+        <text class="label" x="430" y="241">In Progress</text>
+        <text class="sub" x="430" y="260">Developer · skip estimation</text>
+        <path class="arrow" marker-end="url(#bugArrow)" d="M430 278 L430 306" />
+
+        <!-- Code Review -->
+        <rect class="node-rect" x="300" y="308" width="260" height="64" rx="10" />
+        <text class="label" x="430" y="335">Code Review</text>
+        <text class="sub" x="430" y="354">Developer · until merge</text>
+        <path class="arrow" marker-end="url(#bugArrow)" d="M430 372 L430 400" />
+
+        <!-- Dev Done -->
+        <rect class="node-rect" x="300" y="402" width="260" height="64" rx="10" />
+        <text class="label" x="430" y="429">Dev Done</text>
+        <text class="sub" x="430" y="448">Developer · after merge</text>
+        <path class="arrow" marker-end="url(#bugArrow)" d="M430 466 L430 494" />
+
+        <!-- Ready to QA -->
+        <rect class="node-rect" x="300" y="496" width="260" height="64" rx="10" />
+        <text class="label" x="430" y="523">Ready to QA</text>
+        <text class="sub" x="430" y="542">Tech Lead</text>
+        <path class="arrow" marker-end="url(#bugArrow)" d="M430 560 L430 588" />
+
+        <!-- QA In Progress -->
+        <rect class="node-rect" x="300" y="590" width="260" height="64" rx="10" />
+        <text class="label" x="430" y="617">QA In Progress</text>
+        <text class="sub" x="430" y="636">QA Lead / QA members</text>
+        <path class="arrow-decision" marker-end="url(#bugArrowDecision)" d="M430 654 L430 700" />
+
+        <!-- Decision -->
+        <polygon class="node-decision" points="430,712 500,782 430,852 360,782" />
+        <text class="label" x="430" y="778">QA</text>
+        <text class="label" x="430" y="796">Result?</text>
+
+        <!-- YES path (complete to Done) — same as Story -->
+        <path class="arrow" marker-end="url(#bugArrow)" d="M500 782 L620 782 L620 820" />
+        <text class="edge-label edge-yes" x="560" y="770">YES / Passed</text>
+
+        <rect class="node-pass" x="490" y="822" width="260" height="64" rx="10" />
+        <text class="label" x="620" y="849">QA Passed</text>
+        <text class="sub" x="620" y="868">QA</text>
+        <path class="arrow" marker-end="url(#bugArrow)" d="M620 886 L620 914" />
+
+        <rect class="node-rect" x="490" y="916" width="260" height="64" rx="10" />
+        <text class="label" x="620" y="943">Ready for Deployment</text>
+        <text class="sub" x="620" y="962">Developer</text>
+        <path class="arrow" marker-end="url(#bugArrow)" d="M620 980 L620 1008" />
+
+        <rect class="node-rect" x="490" y="1010" width="260" height="70" rx="10" />
+        <text class="label" x="620" y="1038">Production Monitoring</text>
+        <text class="sub" x="620" y="1058">Tech Lead · after Play Store</text>
+        <path class="arrow" marker-end="url(#bugArrow)" d="M620 1080 L620 1108" />
+
+        <rect class="node-done" x="510" y="1110" width="220" height="58" rx="29" />
+        <text class="label" x="620" y="1137">Done</text>
+        <text class="sub" x="620" y="1155">QA closes sprint item</text>
+
+        <!-- NO path (fail loop) — same as Story -->
+        <path class="arrow-fail" marker-end="url(#bugArrowFail)" d="M360 782 L180 782 L180 820" />
+        <text class="edge-label edge-no" x="270" y="770">NO / Failed</text>
+
+        <rect class="node-fail" x="50" y="822" width="260" height="64" rx="10" />
+        <text class="label" x="180" y="849">QA Testing Failed</text>
+        <text class="sub" x="180" y="868">QA</text>
+        <path class="arrow-fail" marker-end="url(#bugArrowFail)" d="M180 886 L180 914" />
+
+        <rect class="node-rect" x="50" y="916" width="260" height="64" rx="10" />
+        <text class="label" x="180" y="943">In Progress</text>
+        <text class="sub" x="180" y="962">Developer fixes</text>
+
+        <path class="arrow-fail" marker-end="url(#bugArrowFail)" d="M50 948 L24 948 L24 246 L300 246" />
+        <text class="edge-label edge-no" x="24" y="600" transform="rotate(-90 24 600)">Fix loop back</text>
+        <text class="sub" x="150" y="1002">Then: Code Review → Dev Done</text>
+        <text class="sub" x="150" y="1020">→ Ready to QA → QA In Progress</text>
+      </svg>
+    </section>
+
+    <!-- BOTH -->
+    <section class="panel" id="both" aria-label="Combined flowchart">
+      <svg class="flow-svg" viewBox="0 0 860 1560" role="img" aria-label="Story and Bug combined flowchart">
+        <defs>
+          <marker id="arrowHead3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#3dd68c" />
+          </marker>
+          <marker id="arrowHeadFail3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#ff8f7a" />
+          </marker>
+          <marker id="arrowHeadDecision3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#c9a0ff" />
+          </marker>
+        </defs>
+
+        <rect class="node-backlog" x="280" y="20" width="300" height="70" rx="16" />
+        <text class="label" x="430" y="50">Backlog</text>
+        <text class="sub" x="430" y="70">All To Do Story + Bug tasks</text>
+        <path class="arrow" style="marker-end:url(#arrowHead3)" d="M430 90 L430 118" />
+
+        <rect class="node-todo" x="300" y="120" width="260" height="64" rx="10" />
+        <text class="label" x="430" y="147">To Do</text>
+        <text class="sub" x="430" y="166">Common start</text>
+
+        <!-- split -->
+        <path class="arrow" style="marker-end:url(#arrowHead3)" d="M430 184 L430 210 L250 210 L250 238" />
+        <path class="arrow" style="marker-end:url(#arrowHead3)" d="M430 210 L610 210 L610 238" />
+        <text class="edge-label" style="fill:#6eb6ff" x="250" y="228">Story</text>
+        <text class="edge-label" style="fill:#ffb070" x="610" y="228">Bug</text>
+
+        <!-- Story branch -->
+        <rect class="node-story" x="120" y="240" width="260" height="56" rx="10" />
+        <text class="label" x="250" y="265">Ready for Estimation</text>
+        <text class="sub" x="250" y="282">PM</text>
+        <path class="arrow" style="marker-end:url(#arrowHead3)" d="M250 296 L250 318" />
+
+        <rect class="node-story" x="120" y="320" width="260" height="56" rx="10" />
+        <text class="label" x="250" y="345">Ready for Development</text>
+        <text class="sub" x="250" y="362">Tech Lead</text>
+        <path class="arrow" style="marker-end:url(#arrowHead3)" d="M250 376 L250 398" />
+
+        <rect class="node-rect" x="120" y="400" width="260" height="56" rx="10" />
+        <text class="label" x="250" y="425">In Progress</text>
+        <text class="sub" x="250" y="442">Developer</text>
+
+        <!-- Bug branch -->
+        <rect class="node-bug" x="480" y="240" width="260" height="56" rx="10" />
+        <text class="label" x="610" y="265">In Progress</text>
+        <text class="sub" x="610" y="282">Developer · direct</text>
+
+        <!-- merge -->
+        <path class="arrow" style="marker-end:url(#arrowHead3)" d="M250 456 L250 480 L430 480 L430 508" />
+        <path class="arrow" style="marker-end:url(#arrowHead3)" d="M610 296 L610 480 L430 480" />
+
+        <rect class="node-rect" x="300" y="510" width="260" height="56" rx="10" />
+        <text class="label" x="430" y="535">Code Review</text>
+        <text class="sub" x="430" y="552">Developer · until merge</text>
+        <path class="arrow" style="marker-end:url(#arrowHead3)" d="M430 566 L430 588" />
+
+        <rect class="node-rect" x="300" y="590" width="260" height="56" rx="10" />
+        <text class="label" x="430" y="615">Dev Done</text>
+        <text class="sub" x="430" y="632">Developer · after merge</text>
+        <path class="arrow" style="marker-end:url(#arrowHead3)" d="M430 646 L430 668" />
+
+        <rect class="node-rect" x="300" y="670" width="260" height="56" rx="10" />
+        <text class="label" x="430" y="695">Ready to QA</text>
+        <text class="sub" x="430" y="712">Tech Lead</text>
+        <path class="arrow" style="marker-end:url(#arrowHead3)" d="M430 726 L430 748" />
+
+        <rect class="node-rect" x="300" y="750" width="260" height="56" rx="10" />
+        <text class="label" x="430" y="775">QA In Progress</text>
+        <text class="sub" x="430" y="792">QA Lead / QA members</text>
+        <path class="arrow-decision" style="marker-end:url(#arrowHeadDecision3)" d="M430 806 L430 848" />
+
+        <polygon class="node-decision" points="430,860 500,930 430,1000 360,930" />
+        <text class="label" x="430" y="926">QA</text>
+        <text class="label" x="430" y="944">Result?</text>
+
+        <path class="arrow" style="marker-end:url(#arrowHead3)" d="M500 930 L620 930 L620 968" />
+        <text class="edge-label edge-yes" x="560" y="918">YES / Passed</text>
+
+        <rect class="node-pass" x="490" y="970" width="260" height="56" rx="10" />
+        <text class="label" x="620" y="995">QA Passed</text>
+        <text class="sub" x="620" y="1012">QA</text>
+        <path class="arrow" style="marker-end:url(#arrowHead3)" d="M620 1026 L620 1048" />
+
+        <rect class="node-rect" x="490" y="1050" width="260" height="56" rx="10" />
+        <text class="label" x="620" y="1075">Ready for Deployment</text>
+        <text class="sub" x="620" y="1092">Developer</text>
+        <path class="arrow" style="marker-end:url(#arrowHead3)" d="M620 1106 L620 1128" />
+
+        <rect class="node-rect" x="490" y="1130" width="260" height="64" rx="10" />
+        <text class="label" x="620" y="1156">Production Monitoring</text>
+        <text class="sub" x="620" y="1174">Tech Lead · Play Store</text>
+        <path class="arrow" style="marker-end:url(#arrowHead3)" d="M620 1194 L620 1216" />
+
+        <rect class="node-done" x="510" y="1218" width="220" height="56" rx="28" />
+        <text class="label" x="620" y="1244">Done</text>
+        <text class="sub" x="620" y="1261">QA</text>
+
+        <path class="arrow-fail" style="marker-end:url(#arrowHeadFail3)" d="M360 930 L180 930 L180 968" />
+        <text class="edge-label edge-no" x="270" y="918">NO / Failed</text>
+
+        <rect class="node-fail" x="50" y="970" width="260" height="56" rx="10" />
+        <text class="label" x="180" y="995">QA Testing Failed</text>
+        <text class="sub" x="180" y="1012">QA</text>
+        <path class="arrow-fail" style="marker-end:url(#arrowHeadFail3)" d="M180 1026 L180 1048" />
+
+        <rect class="node-rect" x="50" y="1050" width="260" height="56" rx="10" />
+        <text class="label" x="180" y="1075">In Progress</text>
+        <text class="sub" x="180" y="1092">Developer</text>
+
+        <path class="arrow-fail" style="marker-end:url(#arrowHeadFail3)" d="M50 1078 L24 1078 L24 538 L300 538" />
+        <text class="sub" x="150" y="1130">Loop: Code Review → Dev Done</text>
+        <text class="sub" x="150" y="1148">→ Ready to QA → QA In Progress</text>
+      </svg>
+    </section>
+
+    <div class="legend">
+      <span>Full Story path ends at Done</span>
+      <span>YES = release path</span>
+      <span>NO = fix loop back to In Progress</span>
+    </div>
+  </div>
+
+  <script>
+    const tabs = document.querySelectorAll(".tab");
+    const panels = document.querySelectorAll(".panel");
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        tabs.forEach((t) => t.classList.remove("active"));
+        panels.forEach((p) => p.classList.remove("active"));
+        tab.classList.add("active");
+        document.getElementById(tab.dataset.target).classList.add("active");
+      });
+    });
+  </script>
+</body>
+</html>
