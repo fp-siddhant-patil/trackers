@@ -1,13 +1,16 @@
-# Engineering Docs
+# Engineering Trackers
 
-Single place for process docs, workflows, and playbooks.
+Single place for release boards, process docs, and playbooks.
 
-Browse on GitHub, or enable **Settings → Pages → Deploy from branch `main` / root** to host the hub site.
+Live site: [fp-siddhant-patil.github.io/trackers](https://fp-siddhant-patil.github.io/trackers/)
+
+GitHub Pages is served from branch `main`, folder `/docs`.
 
 ## Docs catalog
 
 | Doc | Type | Status |
 |---|---|---|
+| [Release Tracker](docs/release-tracker/) | 19 Aug + 2 Sep boards | Active |
 | [Jira Development Workflow](docs/jira-development-workflow/) | Process + flowchart | Active |
 | [Jira Workflow Prompt](docs/jira-development-workflow/PROMPT.md) | AI / setup prompt | Active |
 

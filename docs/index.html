@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Engineering Trackers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Figtree:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #07110d;
+      --text: #e8f3ec;
+      --muted: #93b0a2;
+      --accent: #3dd68c;
+      --line: #2f4a3d;
+      --panel: #102019;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      font-family: "Figtree", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse 70% 45% at 15% 0%, rgba(61, 214, 140, 0.18), transparent 55%),
+        var(--ink);
+      padding: 2.5rem 1.25rem 4rem;
+    }
+    .wrap { max-width: 720px; margin: 0 auto; }
+    h1 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: clamp(2.2rem, 6vw, 3.4rem);
+      letter-spacing: -0.04em;
+      line-height: 0.95;
+    }
+    h1 span { color: var(--accent); }
+    .lede {
+      margin-top: 0.85rem;
+      color: var(--muted);
+      line-height: 1.55;
+      max-width: 34rem;
+    }
+    .list {
+      margin-top: 2rem;
+      display: grid;
+      gap: 0.85rem;
+    }
+    a.card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 1rem;
+      padding: 1.1rem 1.2rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    a.card:hover {
+      border-color: rgba(61, 214, 140, 0.55);
+      transform: translateY(-1px);
+    }
+    .card h2 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+    }
+    .card p {
+      margin-top: 0.35rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+    .meta {
+      margin-top: 0.7rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .foot {
+      margin-top: 2rem;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+    .foot code {
+      color: var(--text);
+      font-size: 0.84rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Engineering <span>Trackers</span></h1>
+    <p class="lede">
+      Release boards and process docs. Hosted from this repo on GitHub Pages.
+    </p>
+
+    <div class="list">
+      <a class="card" href="release-tracker/index.html">
+        <h2>Release Tracker</h2>
+        <p>Tickets shipping 19 August 2026, and what is planned for 2 September 2026.</p>
+        <div class="meta">Releases · Active</div>
+      </a>
+      <a class="card" href="jira-development-workflow/index.html">
+        <h2>Jira Development Workflow</h2>
+        <p>Story and Bug status flow, owners, QA fail loop, and Play Store monitoring to Done.</p>
+        <div class="meta">Process · Active</div>
+      </a>
+      <a class="card" href="jira-development-workflow/flowchart.html">
+        <h2>Jira Workflow Flowchart</h2>
+        <p>Interactive Story / Bug / Both flowchart view.</p>
+        <div class="meta">Diagram · HTML</div>
+      </a>
+    </div>
+
+    <p class="foot">
+      Add tickets in <code>docs/release-tracker/data.js</code>, then push to <code>main</code>.
+    </p>
+  </div>
+</body>
+</html>
