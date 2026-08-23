@@ -46,6 +46,34 @@
       text-transform: uppercase;
       color: var(--muted);
     }
+    .switch {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      padding: 0.3rem;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 999px;
+      width: fit-content;
+      max-width: 100%;
+      flex-wrap: wrap;
+    }
+    .switch button {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 0.55rem 1.15rem;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .switch button[aria-selected="true"] {
+      background: var(--ink);
+      color: var(--accent);
+      outline: 1px solid rgba(61, 214, 140, 0.45);
+    }
     .tabs {
       display: flex;
       gap: 0.7rem;
@@ -163,12 +191,13 @@
     <header>
       <h1>COO <span>Tracker</span></h1>
       <p class="lede">
-        App and web frontend, week by week. No names — only what went live, what is in QA, and infra tests.
+        Pick a week, then switch between App and Web frontend.
       </p>
       <p class="updated" id="updated"></p>
     </header>
 
     <div class="tabs" id="tabs" role="tablist" aria-label="Weeks"></div>
+    <div class="switch" id="switch" role="tablist" aria-label="App or web"></div>
     <div class="stats" id="stats"></div>
     <p class="summary" id="summary"></p>
     <div id="sections"></div>
@@ -181,15 +210,17 @@
   <script>
     const data = window.COO_TRACKER;
     let activeId = data.weeks[0].id;
+    let stream = "app";
+
+    const STREAMS = [
+      { id: "app", label: "App" },
+      { id: "web", label: "Web frontend" }
+    ];
 
     function fmtDate(iso) {
       return new Date(iso + "T00:00:00").toLocaleDateString("en-IN", {
         day: "numeric", month: "short", year: "numeric"
       });
-    }
-
-    function itemCount(week) {
-      return week.sections.reduce((n, section) => n + section.items.length, 0);
     }
 
     function ticketLink(key) {
@@ -201,29 +232,44 @@
       return data.weeks.find((week) => week.id === activeId) || data.weeks[0];
     }
 
+    function streamSections(week) {
+      return week.sections.filter((section) => (section.stream || "app") === stream);
+    }
+
+    function itemCount(week, streamId) {
+      return week.sections
+        .filter((section) => (section.stream || "app") === streamId)
+        .reduce((n, section) => n + section.items.length, 0);
+    }
+
     function renderTabs() {
       document.getElementById("tabs").innerHTML = data.weeks.map((week) => (
         '<button class="tab" role="tab" data-id="' + week.id + '" aria-selected="' + (week.id === activeId) + '">' +
           '<div class="when">' + week.range + "</div>" +
-          '<div class="meta">' + itemCount(week) + " updates</div>" +
+          '<div class="meta">App ' + itemCount(week, "app") + " · Web " + itemCount(week, "web") + "</div>" +
           '<div class="pill">' + week.label + "</div>" +
         "</button>"
       )).join("");
     }
 
-    function renderStats(week) {
-      const cells = week.sections.map((section) => [
-        section.status,
-        section.title.split("—")[0].trim()
-      ]);
-      document.getElementById("stats").innerHTML = cells.map(([status, label]) => (
-        '<div class="stat"><b>' + status + "</b><span>" + label + "</span></div>"
+    function renderSwitch() {
+      document.getElementById("switch").innerHTML = STREAMS.map((item) => (
+        '<button type="button" data-stream="' + item.id + '" aria-selected="' + (item.id === stream) + '">' +
+          item.label +
+        "</button>"
       )).join("");
     }
 
-    function renderSections(week) {
-      document.getElementById("summary").textContent = week.summary || "";
-      document.getElementById("sections").innerHTML = week.sections.map((section) => (
+    function renderStats(sections) {
+      document.getElementById("stats").innerHTML = sections.map((section) => (
+        '<div class="stat"><b>' + section.status + "</b><span>" + section.title + "</span></div>"
+      )).join("");
+    }
+
+    function renderSections(week, sections) {
+      const summary = stream === "web" ? week.summaryWeb : week.summaryApp;
+      document.getElementById("summary").textContent = summary || week.summary || "";
+      document.getElementById("sections").innerHTML = sections.map((section) => (
         '<section class="section" data-id="' + section.id + '">' +
           "<h2>" + section.title + "</h2>" +
           '<div class="status">' + section.status + "</div>" +
@@ -238,16 +284,25 @@
 
     function render() {
       const week = activeWeek();
+      const sections = streamSections(week);
       document.getElementById("updated").textContent = "Updated " + fmtDate(data.updated);
       renderTabs();
-      renderStats(week);
-      renderSections(week);
+      renderSwitch();
+      renderStats(sections);
+      renderSections(week, sections);
     }
 
     document.getElementById("tabs").addEventListener("click", (event) => {
       const tab = event.target.closest(".tab");
       if (!tab) return;
       activeId = tab.dataset.id;
+      render();
+    });
+
+    document.getElementById("switch").addEventListener("click", (event) => {
+      const btn = event.target.closest("button[data-stream]");
+      if (!btn) return;
+      stream = btn.dataset.stream;
       render();
     });
 

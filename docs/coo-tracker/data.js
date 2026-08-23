@@ -9,11 +9,14 @@ window.COO_TRACKER = {
       range: "17–23 August 2026",
       title: "This week",
       label: "Latest",
-      summary:
-        "App 6.20 is live. App 6.21 is with QA. Website W4: SEO and journey fixes are live; speed, About Us memberships, webview lender flow, and app+web monorepo setup are still in progress. Internal app build was used to test the database migration.",
+      summaryApp:
+        "App 6.20 is live. App 6.21 is with QA. An internal build was used to test the database migration.",
+      summaryWeb:
+        "Website W4: SEO and journey fixes are live. Speed, About Us memberships, webview lender flow, and app+web monorepo are still in progress.",
       sections: [
         {
           id: "live",
+          stream: "app",
           title: "Live on stores — app 6.20",
           status: "Published",
           items: [
@@ -41,6 +44,7 @@ window.COO_TRACKER = {
         },
         {
           id: "build",
+          stream: "app",
           title: "Build given to QA — app 6.21",
           status: "Not on stores yet",
           items: [
@@ -76,6 +80,7 @@ window.COO_TRACKER = {
         },
         {
           id: "migration",
+          stream: "app",
           title: "Database migration — internal test",
           status: "Not a store release",
           items: [
@@ -87,7 +92,8 @@ window.COO_TRACKER = {
         },
         {
           id: "web-done",
-          title: "Web frontend — done this week",
+          stream: "web",
+          title: "Done this week",
           status: "Live / monitoring",
           items: [
             {
@@ -122,7 +128,8 @@ window.COO_TRACKER = {
         },
         {
           id: "web-wip",
-          title: "Web frontend — still in progress",
+          stream: "web",
+          title: "Still in progress",
           status: "In progress / QA",
           items: [
             {
