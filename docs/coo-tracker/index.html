@@ -87,6 +87,7 @@
       margin-top: 1.6rem;
       flex-wrap: wrap;
     }
+    .tabs.is-off { display: none; }
     .tab {
       appearance: none;
       border: 1px solid var(--line);
@@ -166,7 +167,10 @@
       color: var(--story);
     }
     .section[data-id="live"] .status,
-    .section[data-id="web-done"] .status { color: var(--accent); }
+    .section[data-id="web-done"] .status,
+    .section[data-id="revamp-done"] .status { color: var(--accent); }
+    .section[data-id="revamp-queued"] .status { color: var(--muted); }
+    .sheet-link { font-size: 0.88rem; }
     .section ul {
       margin: 0.85rem 0 0 1.1rem;
       color: var(--text);
@@ -198,22 +202,23 @@
     <header>
       <h1>COO <span>Tracker</span></h1>
       <p class="lede">
-        Choose App or Web frontend, then pick a week.
+        Choose App, Web frontend, or App revamp.
       </p>
       <p class="updated" id="updated"></p>
     </header>
 
-    <div class="switch" id="switch" role="tablist" aria-label="App or web"></div>
+    <div class="switch" id="switch" role="tablist" aria-label="App, web, or revamp"></div>
     <div class="tabs" id="tabs" role="tablist" aria-label="Weeks"></div>
     <div class="stats" id="stats"></div>
     <p class="summary" id="summary"></p>
     <div id="sections"></div>
     <p class="how">
-      Next week: add a new object at the top of <code>docs/coo-tracker/data.js</code> and push to <code>main</code>.
+      App and web: add a new week at the top of <code>docs/coo-tracker/data.js</code>.
+      App revamp follows the module Google Sheet.
     </p>
   </div>
 
-  <script src="data.js?v=2026-08-23-web"></script>
+  <script src="data.js?v=2026-08-23-revamp"></script>
   <script>
     const data = window.COO_TRACKER;
     if (!data || !data.weeks || !data.weeks.length) {
@@ -222,11 +227,14 @@
     } else {
     const hashStream = (location.hash || "").replace("#", "");
     let activeId = data.weeks[0].id;
-    let stream = hashStream === "web" ? "web" : "app";
+    let stream = hashStream === "web" || hashStream === "revamp" ? hashStream : "app";
+    let revampRows = (data.revamp && data.revamp.rows) ? data.revamp.rows.slice() : [];
+    let revampLive = false;
 
     const STREAMS = [
       { id: "app", label: "App" },
-      { id: "web", label: "Web frontend" }
+      { id: "web", label: "Web frontend" },
+      { id: "revamp", label: "App revamp" }
     ];
 
     function fmtDate(iso) {
@@ -257,13 +265,110 @@
     }
 
     function itemCount(week, streamId) {
+      if (streamId === "revamp") return revampRows.length;
       return week.sections
         .filter((section) => sectionStream(section) === streamId)
         .reduce((n, section) => n + (section.items ? section.items.length : 0), 0);
     }
 
+    function statusBucket(status) {
+      const value = String(status || "").trim().toLowerCase();
+      if (value === "done" || value === "complete" || value === "completed") return "done";
+      if (value === "in progress" || value === "in-progress" || value === "wip" || value === "qa") return "progress";
+      return "queued";
+    }
+
+    function rowLabel(row) {
+      const moduleName = String(row.module || "").trim();
+      const sub = String(row.sub || "").trim();
+      if (moduleName && sub) return moduleName + " — " + sub;
+      return moduleName || sub;
+    }
+
+    function normalizeRevampRows(rows) {
+      const out = [];
+      let lastModule = "";
+      (rows || []).forEach((row) => {
+        const rawModule = String(row.module || "").trim();
+        const sub = String(row.sub || "").trim();
+        if (rawModule) lastModule = rawModule;
+        const moduleName = rawModule || lastModule;
+        if (!moduleName && !sub) return;
+        out.push({
+          module: moduleName,
+          sub: sub,
+          key: String(row.key || "").trim(),
+          status: String(row.status || "").trim() || "Not started"
+        });
+      });
+      return out;
+    }
+
+    function revampCounts() {
+      const counts = { done: 0, progress: 0, queued: 0 };
+      revampRows.forEach((row) => { counts[statusBucket(row.status)] += 1; });
+      return counts;
+    }
+
+    function revampSections() {
+      const groups = {
+        done: { id: "revamp-done", title: "Done", status: "Rebuild complete", items: [] },
+        progress: { id: "revamp-progress", title: "In progress", status: "Being rebuilt", items: [] },
+        queued: { id: "revamp-queued", title: "Not started", status: "Queued", items: [] }
+      };
+      revampRows.forEach((row) => {
+        groups[statusBucket(row.status)].items.push({
+          what: rowLabel(row),
+          key: row.key
+        });
+      });
+      return ["done", "progress", "queued"].map((key) => groups[key]).filter((section) => section.items.length);
+    }
+
+    function rowsFromGviz(res) {
+      if (!res || !res.table || !res.table.cols || !res.table.rows) return [];
+      const labels = res.table.cols.map((col) => String((col && (col.label || col.id)) || "").toLowerCase());
+      function idx(names) {
+        for (let i = 0; i < names.length; i += 1) {
+          const found = labels.indexOf(names[i]);
+          if (found >= 0) return found;
+        }
+        return -1;
+      }
+      const moduleIdx = idx(["module name", "module"]);
+      const subIdx = idx(["sub module name", "submodule", "sub module"]);
+      const jiraIdx = idx(["jira", "ticket", "key"]);
+      const statusIdx = idx(["status"]);
+      function cell(row, index) {
+        if (index < 0 || !row.c || !row.c[index] || row.c[index].v == null) return "";
+        return String(row.c[index].v).trim();
+      }
+      return normalizeRevampRows(res.table.rows.map((row) => ({
+        module: cell(row, moduleIdx),
+        sub: cell(row, subIdx),
+        key: cell(row, jiraIdx),
+        status: cell(row, statusIdx)
+      })));
+    }
+
+    function htmlList(sections) {
+      return sections.map((section) => (
+        '<section class="section" data-id="' + section.id + '">' +
+          "<h2>" + section.title + "</h2>" +
+          '<div class="status">' + section.status + "</div>" +
+          "<ul>" +
+            (section.items || []).map((item) => (
+              "<li>" + item.what + (item.key ? " " + ticketLink(item.key) : "") + "</li>"
+            )).join("") +
+          "</ul>" +
+        "</section>"
+      )).join("");
+    }
+
     function renderTabs() {
-      document.getElementById("tabs").innerHTML = data.weeks.map((week) => (
+      const tabs = document.getElementById("tabs");
+      tabs.classList.toggle("is-off", stream === "revamp");
+      tabs.innerHTML = data.weeks.map((week) => (
         '<button class="tab" role="tab" data-id="' + week.id + '" aria-selected="' + (week.id === activeId) + '">' +
           '<div class="when">' + week.range + "</div>" +
           '<div class="meta">App ' + itemCount(week, "app") + " · Web " + itemCount(week, "web") + "</div>" +
@@ -287,7 +392,7 @@
       )).join("");
     }
 
-    function renderSections(week, sections) {
+    function renderWeekView(week, sections) {
       const summary = stream === "web" ? week.summaryWeb : week.summaryApp;
       document.getElementById("summary").textContent = summary || week.summary || "";
       if (!sections.length) {
@@ -295,27 +400,62 @@
           '<p class="empty">No ' + (stream === "web" ? "web frontend" : "app") + " updates in this week.</p>";
         return;
       }
-      document.getElementById("sections").innerHTML = sections.map((section) => (
-        '<section class="section" data-id="' + section.id + '">' +
-          "<h2>" + section.title + "</h2>" +
-          '<div class="status">' + section.status + "</div>" +
-          "<ul>" +
-            (section.items || []).map((item) => (
-              "<li>" + item.what + (item.key ? " " + ticketLink(item.key) : "") + "</li>"
-            )).join("") +
-          "</ul>" +
-        "</section>"
-      )).join("");
+      document.getElementById("sections").innerHTML = htmlList(sections);
+    }
+
+    function renderRevampView() {
+      const counts = revampCounts();
+      const sheetUrl = data.revamp && data.revamp.sheetUrl ? data.revamp.sheetUrl : "";
+      const source = revampLive
+        ? "Live from the module sheet."
+        : "Snapshot from the module sheet (" + fmtDate((data.revamp && data.revamp.pulled) || data.updated) + ").";
+      document.getElementById("summary").innerHTML =
+        (data.revamp && data.revamp.summary ? data.revamp.summary + " " : "") +
+        source +
+        (sheetUrl ? ' <a class="sheet-link" href="' + sheetUrl + '" target="_blank" rel="noreferrer">Open sheet</a>' : "");
+      renderStats([
+        { title: "Done", status: String(counts.done) },
+        { title: "In progress", status: String(counts.progress) },
+        { title: "Not started", status: String(counts.queued) }
+      ]);
+      const sections = revampSections();
+      document.getElementById("sections").innerHTML = sections.length
+        ? htmlList(sections)
+        : '<p class="empty">No app revamp modules in the sheet yet.</p>';
     }
 
     function render() {
-      const week = activeWeek();
-      const sections = streamSections(week);
       document.getElementById("updated").textContent = "Updated " + fmtDate(data.updated);
       renderSwitch();
       renderTabs();
+      if (stream === "revamp") {
+        renderRevampView();
+        return;
+      }
+      const week = activeWeek();
+      const sections = streamSections(week);
       renderStats(sections);
-      renderSections(week, sections);
+      renderWeekView(week, sections);
+    }
+
+    function loadRevampSheet() {
+      if (!data.revamp || !data.revamp.sheetId) return;
+      window.google = window.google || {};
+      window.google.visualization = window.google.visualization || {};
+      window.google.visualization.Query = window.google.visualization.Query || {};
+      window.google.visualization.Query.setResponse = function (res) {
+        const rows = rowsFromGviz(res);
+        if (!rows.length) return;
+        revampRows = rows;
+        revampLive = true;
+        render();
+      };
+      const script = document.createElement("script");
+      script.src = "https://docs.google.com/spreadsheets/d/" +
+        encodeURIComponent(data.revamp.sheetId) +
+        "/gviz/tq?gid=" + encodeURIComponent(data.revamp.gid || "0") +
+        "&tqx=out:json";
+      document.body.appendChild(script);
     }
 
     document.getElementById("tabs").addEventListener("click", (event) => {
@@ -333,7 +473,9 @@
       render();
     });
 
+    revampRows = normalizeRevampRows(revampRows);
     render();
+    loadRevampSheet();
     }
   </script>
 </body>

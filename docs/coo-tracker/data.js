@@ -3,6 +3,38 @@
 window.COO_TRACKER = {
   updated: "2026-08-23",
   jiraBase: "https://fatakpay.atlassian.net/browse",
+  revamp: {
+    title: "App revamp",
+    sheetUrl: "https://docs.google.com/spreadsheets/d/1pSMt9Vua2AD2v2WFfmHmT0Z7SDpfM4j4x0ykQfsR0CU/edit?pli=1&gid=0#gid=0",
+    sheetId: "1pSMt9Vua2AD2v2WFfmHmT0Z7SDpfM4j4x0ykQfsR0CU",
+    gid: "0",
+    pulled: "2026-08-23",
+    summary:
+      "App rebuild by module. Navigation is done. Onboarding, network, coin wallet, investments, and settings are in progress. The rest has not started.",
+    rows: [
+      { module: "Navigation Stack Architecture", sub: "", key: "", status: "Done" },
+      { module: "Onboarding", sub: "Login Flow", key: "", status: "In Progress" },
+      { module: "Network Layer", sub: "", key: "", status: "In Progress" },
+      { module: "Coin Wallet", sub: "", key: "", status: "In Progress" },
+      { module: "Investments", sub: "", key: "", status: "In Progress" },
+      { module: "Settings", sub: "Feedback & Ratings", key: "", status: "In Progress" },
+      { module: "Settings", sub: "Transaction History", key: "", status: "In Progress" },
+      { module: "UPI", sub: "", key: "", status: "Not started" },
+      { module: "Calculator", sub: "", key: "", status: "Not started" },
+      { module: "EMI Tracker", sub: "", key: "", status: "Not started" },
+      { module: "Dashboard", sub: "", key: "", status: "Not started" },
+      { module: "Loans", sub: "", key: "", status: "Not started" },
+      { module: "BBPS", sub: "", key: "", status: "Not started" },
+      { module: "Fatak-Udaan", sub: "", key: "", status: "Not started" },
+      { module: "Insurance", sub: "", key: "", status: "Not started" },
+      { module: "Financial Wellness", sub: "", key: "", status: "Not started" },
+      { module: "Membership", sub: "", key: "", status: "Not started" },
+      { module: "Refer & Earn", sub: "", key: "", status: "Not started" },
+      { module: "Coupons", sub: "", key: "", status: "Not started" },
+      { module: "Settings", sub: "", key: "", status: "Not started" },
+      { module: "Credit Card", sub: "", key: "", status: "Not started" }
+    ]
+  },
   weeks: [
     {
       id: "2026-08-17",
