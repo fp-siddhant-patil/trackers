@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CTO Write Tracker</title>
+  <title>CTO Weekly Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Figtree:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -15,6 +15,7 @@
       --accent: #3dd68c;
       --line: #2f4a3d;
       --panel: #102019;
+      --story: #6eb6ff;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -25,7 +26,7 @@
         radial-gradient(ellipse 70% 40% at 12% 0%, rgba(61, 214, 140, 0.16), transparent 55%),
         var(--ink);
     }
-    .wrap { max-width: 720px; margin: 0 auto; padding: 2rem 1.2rem 4rem; }
+    .wrap { max-width: 860px; margin: 0 auto; padding: 2rem 1.2rem 4rem; }
     a { color: var(--accent); }
     .back { color: var(--muted); text-decoration: none; font-size: 0.9rem; }
     .back:hover { color: var(--text); }
@@ -37,7 +38,7 @@
       line-height: 0.95;
     }
     h1 span { color: var(--accent); }
-    .lede { margin-top: 0.75rem; color: var(--muted); max-width: 38rem; line-height: 1.55; }
+    .lede { margin-top: 0.75rem; color: var(--muted); max-width: 40rem; line-height: 1.55; }
     .updated {
       margin-top: 0.55rem;
       font-size: 0.78rem;
@@ -45,35 +46,113 @@
       text-transform: uppercase;
       color: var(--muted);
     }
-    .panel {
-      margin-top: 1.8rem;
+    .tabs {
+      display: flex;
+      gap: 0.7rem;
+      margin-top: 1.6rem;
+      flex-wrap: wrap;
+    }
+    .tab {
+      appearance: none;
       border: 1px solid var(--line);
       background: var(--panel);
+      color: var(--text);
       border-radius: 1rem;
-      padding: 1.2rem 1.25rem;
+      padding: 0.95rem 1.1rem;
+      min-width: 200px;
+      text-align: left;
+      cursor: pointer;
+      font: inherit;
     }
-    .panel h2 {
+    .tab[aria-selected="true"] {
+      border-color: rgba(61, 214, 140, 0.7);
+      outline: 1px solid rgba(61, 214, 140, 0.35);
+    }
+    .tab .when {
       font-family: "Bricolage Grotesque", sans-serif;
       font-size: 1.15rem;
       letter-spacing: -0.02em;
     }
-    .panel p, .panel li {
-      margin-top: 0.55rem;
-      color: var(--muted);
-      line-height: 1.55;
-    }
-    .panel ol { margin: 0.4rem 0 0 1.15rem; }
+    .tab .meta { margin-top: 0.3rem; color: var(--muted); font-size: 0.82rem; }
     .pill {
       display: inline-block;
-      margin-top: 0.85rem;
-      font-size: 0.72rem;
+      margin-top: 0.45rem;
+      font-size: 0.7rem;
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
       color: var(--accent);
-      border: 1px solid rgba(61, 214, 140, 0.45);
-      border-radius: 999px;
-      padding: 0.28rem 0.7rem;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.7rem;
+      margin-top: 1.25rem;
+    }
+    .stat {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 0.9rem;
+      padding: 0.85rem 0.95rem;
+    }
+    .stat b {
+      display: block;
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 1.15rem;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+    .stat span { color: var(--muted); font-size: 0.8rem; }
+    .summary {
+      margin-top: 1rem;
+      color: var(--muted);
+      line-height: 1.55;
+      max-width: 44rem;
+    }
+    .section {
+      margin-top: 1.4rem;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 1rem;
+      padding: 1.15rem 1.2rem 1.25rem;
+    }
+    .section h2 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+    }
+    .section .status {
+      display: inline-block;
+      margin-top: 0.4rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--story);
+    }
+    .section[data-id="live"] .status { color: var(--accent); }
+    .section ul {
+      margin: 0.85rem 0 0 1.1rem;
+      color: var(--text);
+      line-height: 1.55;
+    }
+    .section li { margin-top: 0.55rem; }
+    .section li a {
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-left: 0.35rem;
+      white-space: nowrap;
+    }
+    .how {
+      margin-top: 1.6rem;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+    .how code { color: var(--text); font-size: 0.84rem; }
+    @media (max-width: 720px) {
+      .stats { grid-template-columns: 1fr; }
+      .tab { min-width: 0; flex: 1; }
     }
   </style>
 </head>
@@ -81,24 +160,97 @@
   <div class="wrap">
     <a class="back" href="../index.html">← Engineering Trackers</a>
     <header>
-      <h1>CTO <span>Write Tracker</span></h1>
+      <h1>CTO <span>Weekly</span></h1>
       <p class="lede">
-        Executive write-up board for the CTO. Layout and rows will follow the
-        Google Sheet you share; tickets will be pulled from the Jira links you paste.
+        What we shipped, in simple words. No names — only what went live, what is in the next build, and infra tests.
       </p>
-      <p class="updated">Hosted on fp-siddhant-patil/trackers · 23 Aug 2026</p>
-      <span class="pill">Ready for Jira + sheet</span>
+      <p class="updated" id="updated"></p>
     </header>
 
-    <section class="panel">
-      <h2>What happens next</h2>
-      <ol>
-        <li>Paste the Jira links for this tracker in the Cursor agent chat.</li>
-        <li>Share the Google Sheet (view access is enough).</li>
-        <li>This page is regenerated to match the sheet columns and filled from Jira.</li>
-      </ol>
-      <p>Refresh this URL after the next publish. GitHub Pages usually updates within a minute.</p>
-    </section>
+    <div class="tabs" id="tabs" role="tablist" aria-label="Weeks"></div>
+    <div class="stats" id="stats"></div>
+    <p class="summary" id="summary"></p>
+    <div id="sections"></div>
+    <p class="how">
+      Next week: add a new object at the top of <code>docs/cto-write-tracker/data.js</code> and push to <code>main</code>.
+    </p>
   </div>
+
+  <script src="data.js"></script>
+  <script>
+    const data = window.CTO_WEEKLY;
+    let activeId = data.weeks[0].id;
+
+    function fmtDate(iso) {
+      return new Date(iso + "T00:00:00").toLocaleDateString("en-IN", {
+        day: "numeric", month: "short", year: "numeric"
+      });
+    }
+
+    function itemCount(week) {
+      return week.sections.reduce((n, section) => n + section.items.length, 0);
+    }
+
+    function ticketLink(key) {
+      if (!key) return "";
+      return '<a href="' + data.jiraBase + "/" + encodeURIComponent(key) + '" target="_blank" rel="noreferrer">' + key + "</a>";
+    }
+
+    function activeWeek() {
+      return data.weeks.find((week) => week.id === activeId) || data.weeks[0];
+    }
+
+    function renderTabs() {
+      document.getElementById("tabs").innerHTML = data.weeks.map((week) => (
+        '<button class="tab" role="tab" data-id="' + week.id + '" aria-selected="' + (week.id === activeId) + '">' +
+          '<div class="when">' + week.range + "</div>" +
+          '<div class="meta">' + itemCount(week) + " updates</div>" +
+          '<div class="pill">' + week.label + "</div>" +
+        "</button>"
+      )).join("");
+    }
+
+    function renderStats(week) {
+      const cells = week.sections.map((section) => [
+        section.status,
+        section.title.split("—")[0].trim()
+      ]);
+      document.getElementById("stats").innerHTML = cells.map(([status, label]) => (
+        '<div class="stat"><b>' + status + "</b><span>" + label + "</span></div>"
+      )).join("");
+    }
+
+    function renderSections(week) {
+      document.getElementById("summary").textContent = week.summary || "";
+      document.getElementById("sections").innerHTML = week.sections.map((section) => (
+        '<section class="section" data-id="' + section.id + '">' +
+          "<h2>" + section.title + "</h2>" +
+          '<div class="status">' + section.status + "</div>" +
+          "<ul>" +
+            section.items.map((item) => (
+              "<li>" + item.what + (item.key ? " " + ticketLink(item.key) : "") + "</li>"
+            )).join("") +
+          "</ul>" +
+        "</section>"
+      )).join("");
+    }
+
+    function render() {
+      const week = activeWeek();
+      document.getElementById("updated").textContent = "Updated " + fmtDate(data.updated);
+      renderTabs();
+      renderStats(week);
+      renderSections(week);
+    }
+
+    document.getElementById("tabs").addEventListener("click", (event) => {
+      const tab = event.target.closest(".tab");
+      if (!tab) return;
+      activeId = tab.dataset.id;
+      render();
+    });
+
+    render();
+  </script>
 </body>
 </html>

@@ -1,18 +1,24 @@
-# CTO Write Tracker
+# CTO Weekly Tracker
 
-Executive write-up board for the CTO. Hosted on this repo.
+Week-wise write-up for the CTO: what went live, what is in the next app build, and infra tests. No developer names.
 
 Live: [fp-siddhant-patil.github.io/trackers/cto-write-tracker](https://fp-siddhant-patil.github.io/trackers/cto-write-tracker/)
 
-## Sources
+## Add a new week
 
-Filled from:
+Edit [`data.js`](data.js). Put a new object at the **top** of `weeks[]`:
 
-1. Jira issue / filter / board links
-2. The tracker Google Sheet (column layout is the source of truth)
+```js
+{
+  id: "2026-08-24",
+  range: "24–30 August 2026",
+  title: "This week",
+  label: "Latest",
+  summary: "One-line week summary.",
+  sections: [
+    { id: "live", title: "Live on stores — app x.xx", status: "Published", items: [{ key: "FAT-1", what: "Plain-language outcome." }] }
+  ]
+}
+```
 
-Do not invent tickets. Wait for those two sources, then regenerate `index.html`.
-
-## Publish
-
-Push to `main`. GitHub Pages serves `/docs`.
+Then set the previous week’s `label` to `"Previous"`. Push to `main`.

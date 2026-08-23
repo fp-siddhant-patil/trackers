@@ -11,7 +11,7 @@ GitHub Pages is served from branch `main`, folder `/docs`.
 | Doc | Type | Status |
 |---|---|---|
 | [Release Tracker](docs/release-tracker/) | 19 Aug + 2 Sep boards | Active |
-| [CTO Write Tracker](docs/cto-write-tracker/) | Executive board from Jira + Google Sheet | Ready for sources |
+| [CTO Weekly Tracker](docs/cto-write-tracker/) | Week-wise CTO write-up (17–23 Aug) | Active |
 | [Jira Development Workflow](docs/jira-development-workflow/) | Process + flowchart | Active |
 | [Jira Workflow Prompt](docs/jira-development-workflow/PROMPT.md) | AI / setup prompt | Active |
 
