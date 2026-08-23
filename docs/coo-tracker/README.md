@@ -1,6 +1,6 @@
 # COO Tracker
 
-Week-wise write-up for the COO: what went live, what is in the next app build, and infra tests. No developer names.
+Week-wise write-up for the COO: app and web frontend — what went live, what is in QA, and infra tests. No developer names.
 
 Live: [fp-siddhant-patil.github.io/trackers/coo-tracker](https://fp-siddhant-patil.github.io/trackers/coo-tracker/)
 

@@ -85,7 +85,7 @@
     }
     .stats {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 0.7rem;
       margin-top: 1.25rem;
     }
@@ -130,7 +130,8 @@
       text-transform: uppercase;
       color: var(--story);
     }
-    .section[data-id="live"] .status { color: var(--accent); }
+    .section[data-id="live"] .status,
+    .section[data-id="web-done"] .status { color: var(--accent); }
     .section ul {
       margin: 0.85rem 0 0 1.1rem;
       color: var(--text);
@@ -162,7 +163,7 @@
     <header>
       <h1>COO <span>Tracker</span></h1>
       <p class="lede">
-        Week-wise: what went live, what is in the next build, and infra tests. No names — outcomes only.
+        App and web frontend, week by week. No names — only what went live, what is in QA, and infra tests.
       </p>
       <p class="updated" id="updated"></p>
     </header>

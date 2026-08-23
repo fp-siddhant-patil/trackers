@@ -10,7 +10,7 @@ window.COO_TRACKER = {
       title: "This week",
       label: "Latest",
       summary:
-        "App 6.20 is live on the stores. App 6.21 build is with QA. A separate internal build was used to test the database migration.",
+        "App 6.20 is live. App 6.21 is with QA. Website W4: SEO and journey fixes are live; speed, About Us memberships, and webview lender flow are still in progress. Internal app build was used to test the database migration.",
       sections: [
         {
           id: "live",
@@ -82,6 +82,76 @@ window.COO_TRACKER = {
             {
               key: "FAT-1532",
               what: "An internal app build was pointed at the migration servers (mig*) so QA could test login, onboarding, and loan screens against the new database during Saturday night downtime. This build is not for Play Store or App Store. After testing, APIs go back to live production."
+            }
+          ]
+        },
+        {
+          id: "web-done",
+          title: "Web frontend — done this week",
+          status: "Live / monitoring",
+          items: [
+            {
+              key: "FTWB-845",
+              what: "SEO fixes on the website: blog pagination 404s, a proper 404 page, and duplicate titles/descriptions cleaned up."
+            },
+            {
+              key: "FTWB-852",
+              what: "Press articles and thumbnails updated across the website."
+            },
+            {
+              key: "FTWB-851",
+              what: "Refer & Earn page heading (H1) updated."
+            },
+            {
+              key: "FTWB-849",
+              what: "Users can tap Next after bank details auto-fill — they were getting stuck."
+            },
+            {
+              key: "FTWB-866",
+              what: "Edit-application permission issue on production is fixed."
+            },
+            {
+              key: "FTWB-844",
+              what: "Old meta-keywords tag removed sitewide (in production monitoring)."
+            },
+            {
+              key: "FTWB-836",
+              what: "DSA self-registration on web can skip OTP where required (in production monitoring)."
+            }
+          ]
+        },
+        {
+          id: "web-wip",
+          title: "Web frontend — still in progress",
+          status: "In progress / QA",
+          items: [
+            {
+              key: "FTWB-843",
+              what: "Making the website faster on mobile (home and product pages load sooner)."
+            },
+            {
+              key: "FTWB-868",
+              what: "About Us: FatakPay shown as a proud member of IAMAI, FCC, and PCI."
+            },
+            {
+              key: "FTWB-873",
+              what: "KFS and loan agreement documents updated on web."
+            },
+            {
+              key: "FTWB-854",
+              what: "Web correctly handles users whose CIBIL report was already pulled."
+            },
+            {
+              key: "FTWB-850",
+              what: "Yubi Markets GRO details added on the FDPL Finance website."
+            },
+            {
+              key: "FTWB-872",
+              what: "DSA application list: search by mobile number works again."
+            },
+            {
+              key: "FTWB-853",
+              what: "New multi-lender activation flow in webview (in QA)."
             }
           ]
         }
