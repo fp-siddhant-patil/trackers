@@ -4,6 +4,12 @@ Standard delivery workflow for **Story** and **Bug** work.
 
 Interactive flowchart: [flowchart.html](flowchart.html)
 
+## Flow images
+
+![Story Flow](images/story-flow.png)
+
+![Bug Flow](images/bug-flow.png)
+
 ## Issue types
 
 Only two types:
