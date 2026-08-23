@@ -10,7 +10,7 @@ window.COO_TRACKER = {
       title: "This week",
       label: "Latest",
       summary:
-        "App 6.20 is live. App 6.21 is with QA. Website W4: SEO and journey fixes are live; speed, About Us memberships, and webview lender flow are still in progress. Internal app build was used to test the database migration.",
+        "App 6.20 is live. App 6.21 is with QA. Website W4: SEO and journey fixes are live; speed, About Us memberships, webview lender flow, and app+web monorepo setup are still in progress. Internal app build was used to test the database migration.",
       sections: [
         {
           id: "live",
@@ -152,6 +152,10 @@ window.COO_TRACKER = {
             {
               key: "FTWB-853",
               what: "New multi-lender activation flow in webview (in QA)."
+            },
+            {
+              key: "FTWB-846",
+              what: "Monorepo setup so the app and website share one codebase (in progress)."
             }
           ]
         }
