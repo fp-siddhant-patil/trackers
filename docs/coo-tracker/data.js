@@ -1,4 +1,6 @@
-/* COO week-wise tracker. Add a new week object at the top of weeks[]. */
+/* COO week-wise tracker.
+   Each week: edit highlights[] (must-mention points) and summaryAll (combined blurb).
+   Then fill App/Web sections as usual. */
 
 window.COO_TRACKER = {
   updated: "2026-08-24",
@@ -45,6 +47,17 @@ window.COO_TRACKER = {
         "App 6.20 stays live. App 6.21 is with QA, including a ₹149 repayment fix. Database migration was tested on an internal build, not a store release. UPI TPAP is in progress so users can pay inside the app after NPCI certification.",
       summaryWeb:
         "Website W4: SEO and journey fixes are live. Yubi GRO details, CIBIL-already-pulled handling, and DSA mobile search are built. Speed, About Us memberships, loan documents, webview lender flow, and app+web monorepo are still in progress.",
+      summaryAll:
+        "This week: app 6.20 is live, 6.21 is with QA, the database migration was tested internally, UPI TPAP is in progress, and website SEO/journey work is live with a few items built but not released.",
+      highlights: [
+        "App 6.20 is live on stores: campaign users skip home to Card or Personal Loan; home-load tracking; Credit Card/Gold swap; membership fix; Western Capital enabled.",
+        "App 6.21 is with QA, not on stores: more stable, smaller download, FatakLite EMI-again, Udaan score refresh, sanction status, membership banner, membership opt-in recorded, extra ₹149 repayment charge fixed.",
+        "Database migration: Saturday night internal build pointed at mig* servers for login, onboarding, and loan tests. Not a store release. APIs go back to live production. Store users are not on this build.",
+        "UPI TPAP: FatakPay in-app UPI (scan & pay, UPI ID, add bank). Registration is built. Not live until NPCI certification. Login SIM must be in the phone.",
+        "Web live: SEO 404s/duplicate titles, press articles, Refer & Earn heading, bank-details Next, edit-application permission, meta-keywords removed, DSA OTP skip where required.",
+        "Web built, not live: Yubi GRO on FDPL Finance, CIBIL-already-pulled handling, DSA search by mobile.",
+        "Web still in progress: mobile speed, About Us memberships, KFS/loan agreements, multi-lender webview (in QA), app+web monorepo."
+      ],
       sections: [
         {
           id: "live",
@@ -245,6 +258,14 @@ window.COO_TRACKER = {
         "App 6.20 is live. App 6.21 is with QA. An internal build was used to test the database migration.",
       summaryWeb:
         "Website W4: SEO and journey fixes are live. Speed, About Us memberships, webview lender flow, and app+web monorepo are still in progress.",
+      summaryAll:
+        "Last week: app 6.20 went live, 6.21 went to QA, the database migration was tested internally, and website SEO/journey fixes went live.",
+      highlights: [
+        "App 6.20 published: campaign skip-home, home-load tracking, Credit Card/Gold swap, membership fix, Western Capital.",
+        "App 6.21 given to QA: stability, smaller app, FatakLite EMI-again, Udaan score refresh, sanction status, membership banner and opt-in.",
+        "Database migration tested on an internal mig* build. Not a store release.",
+        "Web live: SEO, press, Refer & Earn heading, bank-details Next, edit-application fix, meta-keywords, DSA OTP skip."
+      ],
       sections: [
         {
           id: "live",

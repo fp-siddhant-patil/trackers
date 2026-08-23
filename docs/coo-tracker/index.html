@@ -172,7 +172,7 @@
     .section[data-id="revamp-done"] .status { color: var(--accent); }
     .section[data-id="web-built"] .status,
     .section[data-id="tpap"] .status { color: var(--story); }
-    .section[data-id="revamp-queued"] .status { color: var(--muted); }
+    .section[data-id="highlights"] .status { color: var(--accent); }
     .sheet-link { font-size: 0.88rem; }
     .section ul {
       margin: 0.85rem 0 0 1.1rem;
@@ -205,23 +205,23 @@
     <header>
       <h1>COO <span>Tracker</span></h1>
       <p class="lede">
-        Choose App, Web frontend, or App revamp.
+        Choose Weekly for the must-mention update, or switch to App, Web frontend, or App revamp.
       </p>
       <p class="updated" id="updated"></p>
     </header>
 
-    <div class="switch" id="switch" role="tablist" aria-label="App, web, or revamp"></div>
+    <div class="switch" id="switch" role="tablist" aria-label="Weekly, app, web, or revamp"></div>
     <div class="tabs" id="tabs" role="tablist" aria-label="Weeks"></div>
     <div class="stats" id="stats"></div>
     <p class="summary" id="summary"></p>
     <div id="sections"></div>
     <p class="how">
-      App and web: add a new week at the top of <code>docs/coo-tracker/data.js</code>.
-      App revamp follows the module Google Sheet.
+      Weekly: edit <code>highlights</code> and <code>summaryAll</code> on the week in <code>docs/coo-tracker/data.js</code>.
+      App and web sections sit under that. App revamp follows the module Google Sheet.
     </p>
   </div>
 
-  <script src="data.js?v=2026-08-24-tpap"></script>
+  <script src="data.js?v=2026-08-24-week"></script>
   <script>
     const data = window.COO_TRACKER;
     if (!data || !data.weeks || !data.weeks.length) {
@@ -230,11 +230,14 @@
     } else {
     const hashStream = (location.hash || "").replace("#", "");
     let activeId = data.weeks[0].id;
-    let stream = hashStream === "web" || hashStream === "revamp" ? hashStream : "app";
+    let stream = (hashStream === "web" || hashStream === "revamp" || hashStream === "app")
+      ? hashStream
+      : "week";
     let revampRows = (data.revamp && data.revamp.rows) ? data.revamp.rows.slice() : [];
     let revampLive = false;
 
     const STREAMS = [
+      { id: "week", label: "Weekly" },
       { id: "app", label: "App" },
       { id: "web", label: "Web frontend" },
       { id: "revamp", label: "App revamp" }
@@ -264,11 +267,18 @@
     }
 
     function streamSections(week) {
+      if (stream === "week") return week.sections || [];
       return week.sections.filter((section) => sectionStream(section) === stream);
     }
 
     function itemCount(week, streamId) {
       if (streamId === "revamp") return revampRows.length;
+      if (streamId === "week") {
+        const points = week.highlights && week.highlights.length
+          ? week.highlights.length
+          : (week.sections || []).reduce((n, section) => n + (section.items ? section.items.length : 0), 0);
+        return points;
+      }
       return week.sections
         .filter((section) => sectionStream(section) === streamId)
         .reduce((n, section) => n + (section.items ? section.items.length : 0), 0);
@@ -374,7 +384,7 @@
       tabs.innerHTML = data.weeks.map((week) => (
         '<button class="tab" role="tab" data-id="' + week.id + '" aria-selected="' + (week.id === activeId) + '">' +
           '<div class="when">' + week.range + "</div>" +
-          '<div class="meta">App ' + itemCount(week, "app") + " · Web " + itemCount(week, "web") + "</div>" +
+          '<div class="meta">Weekly ' + itemCount(week, "week") + " · App " + itemCount(week, "app") + " · Web " + itemCount(week, "web") + "</div>" +
           '<div class="pill">' + week.label + "</div>" +
         "</button>"
       )).join("");
@@ -396,8 +406,29 @@
     }
 
     function renderWeekView(week, sections) {
-      const summary = stream === "web" ? week.summaryWeb : week.summaryApp;
+      const summary = stream === "web"
+        ? week.summaryWeb
+        : stream === "week"
+          ? (week.summaryAll || [week.summaryApp, week.summaryWeb].filter(Boolean).join(" "))
+          : week.summaryApp;
       document.getElementById("summary").textContent = summary || week.summary || "";
+      if (stream === "week") {
+        const points = week.highlights || [];
+        const highlightBlock = points.length
+          ? '<section class="section" data-id="highlights">' +
+              "<h2>Must mention this week</h2>" +
+              '<div class="status">Weekly update</div>' +
+              "<ul>" + points.map((point) => "<li>" + point + "</li>").join("") + "</ul>" +
+            "</section>"
+          : "";
+        if (!points.length && !sections.length) {
+          document.getElementById("sections").innerHTML =
+            '<p class="empty">No weekly updates in this week. Add highlights on the week in data.js.</p>';
+          return;
+        }
+        document.getElementById("sections").innerHTML = highlightBlock + htmlList(sections);
+        return;
+      }
       if (!sections.length) {
         document.getElementById("sections").innerHTML =
           '<p class="empty">No ' + (stream === "web" ? "web frontend" : "app") + " updates in this week.</p>";
@@ -437,7 +468,15 @@
       }
       const week = activeWeek();
       const sections = streamSections(week);
-      renderStats(sections);
+      if (stream === "week") {
+        renderStats([
+          { title: "Must mention", status: String((week.highlights || []).length) },
+          { title: "App", status: String(itemCount(week, "app")) },
+          { title: "Web frontend", status: String(itemCount(week, "web")) }
+        ]);
+      } else {
+        renderStats(sections);
+      }
       renderWeekView(week, sections);
     }
 
