@@ -1,6 +1,6 @@
-/* CTO week-wise tracker. Add a new week object at the top of weeks[]. */
+/* COO week-wise tracker. Add a new week object at the top of weeks[]. */
 
-window.CTO_WEEKLY = {
+window.COO_TRACKER = {
   updated: "2026-08-23",
   jiraBase: "https://fatakpay.atlassian.net/browse",
   weeks: [
