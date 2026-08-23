@@ -168,8 +168,10 @@
     }
     .section[data-id="live"] .status,
     .section[data-id="web-done"] .status,
+    .section[data-id="web-live"] .status,
     .section[data-id="revamp-done"] .status { color: var(--accent); }
-    .section[data-id="web-built"] .status { color: var(--story); }
+    .section[data-id="web-built"] .status,
+    .section[data-id="tpap"] .status { color: var(--story); }
     .section[data-id="revamp-queued"] .status { color: var(--muted); }
     .sheet-link { font-size: 0.88rem; }
     .section ul {
@@ -219,7 +221,7 @@
     </p>
   </div>
 
-  <script src="data.js?v=2026-08-24"></script>
+  <script src="data.js?v=2026-08-24-tpap"></script>
   <script>
     const data = window.COO_TRACKER;
     if (!data || !data.weeks || !data.weeks.length) {

@@ -42,9 +42,9 @@ window.COO_TRACKER = {
       title: "This week",
       label: "Latest",
       summaryApp:
-        "App 6.20 stays live. App 6.21 is still with QA, including a repayment fix for a ₹149 extra charge. The migration test build is not a store release.",
+        "App 6.20 stays live. App 6.21 is with QA, including a ₹149 repayment fix. Database migration was tested on an internal build, not a store release. UPI TPAP is in progress so users can pay inside the app after NPCI certification.",
       summaryWeb:
-        "Website W4 runs through 25 Aug. Yubi GRO details, CIBIL-already-pulled handling, and DSA mobile search are built. Speed, About Us memberships, loan documents, webview lender flow, and app+web monorepo are still in progress.",
+        "Website W4: SEO and journey fixes are live. Yubi GRO details, CIBIL-already-pulled handling, and DSA mobile search are built. Speed, About Us memberships, loan documents, webview lender flow, and app+web monorepo are still in progress.",
       sections: [
         {
           id: "live",
@@ -122,7 +122,67 @@ window.COO_TRACKER = {
           items: [
             {
               key: "FAT-1532",
-              what: "An internal app build was pointed at the migration servers (mig*) so QA could test login, onboarding, and loan screens against the new database. This build is not for Play Store or App Store."
+              what: "Saturday night: an internal app build was pointed at the migration servers (mig*) so QA could test login, onboarding, and loan screens on the new database. This is not a Play Store or App Store release. After testing, APIs go back to live production. Store users are not on this build."
+            }
+          ]
+        },
+        {
+          id: "tpap",
+          stream: "app",
+          title: "UPI TPAP — in-app UPI",
+          status: "In progress, not live",
+          items: [
+            {
+              key: "FAT-1464",
+              what: "FatakPay is being set up as a TPAP so users can do UPI inside the app (scan & pay, create UPI ID, add bank, check balance, QR) without leaving to GPay or PhonePe."
+            },
+            {
+              key: "FTK-12728",
+              what: "Android SDK feasibility for TPAP is done."
+            },
+            {
+              key: "FTK-13764",
+              what: "Registration flow is built on the app: SIM verify, pick bank, link account. Users need the login SIM in the phone to register."
+            },
+            {
+              key: "FTK-12727",
+              what: "Not live yet. Add-bank, dashboard and profile UPI screens, and backend bank APIs are still open. A kill-switch will keep UPI hidden until NPCI certification."
+            }
+          ]
+        },
+        {
+          id: "web-live",
+          stream: "web",
+          title: "Live / monitoring",
+          status: "Live",
+          items: [
+            {
+              key: "FTWB-845",
+              what: "SEO: blog pagination 404s, a proper 404 page, and duplicate titles/descriptions cleaned up."
+            },
+            {
+              key: "FTWB-852",
+              what: "Press articles and thumbnails updated across the website."
+            },
+            {
+              key: "FTWB-851",
+              what: "Refer & Earn page heading (H1) updated."
+            },
+            {
+              key: "FTWB-849",
+              what: "Users can tap Next after bank details auto-fill — they were getting stuck."
+            },
+            {
+              key: "FTWB-866",
+              what: "Edit-application permission issue on production is fixed."
+            },
+            {
+              key: "FTWB-844",
+              what: "Old meta-keywords tag removed sitewide (in production monitoring)."
+            },
+            {
+              key: "FTWB-836",
+              what: "DSA self-registration on web can skip OTP where required (in production monitoring)."
             }
           ]
         },
