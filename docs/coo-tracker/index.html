@@ -46,10 +46,17 @@
       text-transform: uppercase;
       color: var(--muted);
     }
+    .empty {
+      margin-top: 1.2rem;
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: 1rem;
+      padding: 1rem 1.1rem;
+    }
     .switch {
       display: flex;
       gap: 0.5rem;
-      margin-top: 1rem;
+      margin-top: 1.25rem;
       padding: 0.3rem;
       border: 1px solid var(--line);
       background: var(--panel);
@@ -191,13 +198,13 @@
     <header>
       <h1>COO <span>Tracker</span></h1>
       <p class="lede">
-        Pick a week, then switch between App and Web frontend.
+        Choose App or Web frontend, then pick a week.
       </p>
       <p class="updated" id="updated"></p>
     </header>
 
-    <div class="tabs" id="tabs" role="tablist" aria-label="Weeks"></div>
     <div class="switch" id="switch" role="tablist" aria-label="App or web"></div>
+    <div class="tabs" id="tabs" role="tablist" aria-label="Weeks"></div>
     <div class="stats" id="stats"></div>
     <p class="summary" id="summary"></p>
     <div id="sections"></div>
@@ -206,11 +213,16 @@
     </p>
   </div>
 
-  <script src="data.js"></script>
+  <script src="data.js?v=2026-08-23-web"></script>
   <script>
     const data = window.COO_TRACKER;
+    if (!data || !data.weeks || !data.weeks.length) {
+      document.getElementById("summary").textContent =
+        "Tracker data did not load. Refresh, or open /coo-tracker/ with the trailing slash.";
+    } else {
+    const hashStream = (location.hash || "").replace("#", "");
     let activeId = data.weeks[0].id;
-    let stream = "app";
+    let stream = hashStream === "web" ? "web" : "app";
 
     const STREAMS = [
       { id: "app", label: "App" },
@@ -232,14 +244,22 @@
       return data.weeks.find((week) => week.id === activeId) || data.weeks[0];
     }
 
+    function sectionStream(section) {
+      if (section.stream === "web" || section.stream === "app") return section.stream;
+      const id = String(section.id || "");
+      const title = String(section.title || "");
+      if (id.indexOf("web") === 0 || /web|frontend|website/i.test(title)) return "web";
+      return "app";
+    }
+
     function streamSections(week) {
-      return week.sections.filter((section) => (section.stream || "app") === stream);
+      return week.sections.filter((section) => sectionStream(section) === stream);
     }
 
     function itemCount(week, streamId) {
       return week.sections
-        .filter((section) => (section.stream || "app") === streamId)
-        .reduce((n, section) => n + section.items.length, 0);
+        .filter((section) => sectionStream(section) === streamId)
+        .reduce((n, section) => n + (section.items ? section.items.length : 0), 0);
     }
 
     function renderTabs() {
@@ -253,9 +273,10 @@
     }
 
     function renderSwitch() {
+      const week = activeWeek();
       document.getElementById("switch").innerHTML = STREAMS.map((item) => (
         '<button type="button" data-stream="' + item.id + '" aria-selected="' + (item.id === stream) + '">' +
-          item.label +
+          item.label + " (" + itemCount(week, item.id) + ")" +
         "</button>"
       )).join("");
     }
@@ -269,12 +290,17 @@
     function renderSections(week, sections) {
       const summary = stream === "web" ? week.summaryWeb : week.summaryApp;
       document.getElementById("summary").textContent = summary || week.summary || "";
+      if (!sections.length) {
+        document.getElementById("sections").innerHTML =
+          '<p class="empty">No ' + (stream === "web" ? "web frontend" : "app") + " updates in this week.</p>";
+        return;
+      }
       document.getElementById("sections").innerHTML = sections.map((section) => (
         '<section class="section" data-id="' + section.id + '">' +
           "<h2>" + section.title + "</h2>" +
           '<div class="status">' + section.status + "</div>" +
           "<ul>" +
-            section.items.map((item) => (
+            (section.items || []).map((item) => (
               "<li>" + item.what + (item.key ? " " + ticketLink(item.key) : "") + "</li>"
             )).join("") +
           "</ul>" +
@@ -286,8 +312,8 @@
       const week = activeWeek();
       const sections = streamSections(week);
       document.getElementById("updated").textContent = "Updated " + fmtDate(data.updated);
-      renderTabs();
       renderSwitch();
+      renderTabs();
       renderStats(sections);
       renderSections(week, sections);
     }
@@ -303,10 +329,12 @@
       const btn = event.target.closest("button[data-stream]");
       if (!btn) return;
       stream = btn.dataset.stream;
+      location.hash = stream;
       render();
     });
 
     render();
+    }
   </script>
 </body>
 </html>
