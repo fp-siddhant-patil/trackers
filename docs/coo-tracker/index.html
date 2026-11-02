@@ -287,11 +287,11 @@
     <p class="summary" id="summary"></p>
     <div id="sections"></div>
     <p class="how">
-      Send HTML in Outlook copies the formatted mail and opens Outlook. Click the message, select all, then paste with Cmd+V, add people, and send. Email this week opens a plain-text draft in the default mail app.
+      Send HTML in Outlook copies the formatted mail, with colours and pod sections, then opens Outlook. Select all in the draft and paste with Cmd+V. Email this week opens a plain-text draft in the default mail app.
     </p>
   </div>
 
-  <script src="data.js?v=2026-11-02-outlook"></script>
+  <script src="data.js?v=2026-11-02-outlook-copy"></script>
   <script>
     const data = window.COO_TRACKER;
     if (!data || !data.weeks || !data.weeks.length) {
@@ -498,6 +498,35 @@
         encodeURIComponent(subject) + "&body=" + encodeURIComponent(note);
     }
 
+    function copyFormattedMail(html) {
+      const host = document.createElement("div");
+      host.style.cssText = "position:fixed;left:-10000px;top:0;width:680px;background:#ffffff;";
+      host.innerHTML = html;
+      document.body.appendChild(host);
+      let copied = false;
+      function onCopy(event) {
+        event.preventDefault();
+        event.clipboardData.setData("text/html", host.innerHTML);
+        event.clipboardData.setData("text/plain", host.innerText);
+        copied = true;
+      }
+      document.addEventListener("copy", onCopy);
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(host);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      try {
+        document.execCommand("copy");
+      } catch (error) {
+        copied = false;
+      }
+      document.removeEventListener("copy", onCopy);
+      selection.removeAllRanges();
+      host.remove();
+      return copied;
+    }
+
     function downloadOutlookDraft(subject, html) {
       const encodedSubject = "=?UTF-8?B?" + btoa(unescape(encodeURIComponent(subject))) + "?=";
       const eml = [
@@ -556,21 +585,16 @@
       const subject = "Siddhant Team engineering update — " + week.range;
       const html = emailHtml(week);
       const status = document.getElementById("emailStatus");
-      const outlook = window.open(outlookComposeUrl(subject, week), "_blank");
-      const copy = navigator.clipboard && navigator.clipboard.write
-        ? navigator.clipboard.write([new ClipboardItem({
-            "text/html": new Blob([html], { type: "text/html" }),
-            "text/plain": new Blob([emailBody(week)], { type: "text/plain" })
-          })])
-        : Promise.reject();
-      copy.then(() => {
-        status.textContent = outlook
-          ? "HTML mail copied. In the Outlook draft, select all and paste with Cmd+V, then add people and send."
-          : "HTML mail copied. Allow pop-ups for Outlook, or open Outlook and paste with Cmd+V.";
-      }).catch(() => {
+      const copied = copyFormattedMail(html);
+      if (!copied) {
         downloadOutlookDraft(subject, html);
-        status.textContent = "Outlook draft downloaded. Open that file in Outlook, add people, and send.";
-      });
+        status.textContent = "Formatted copy did not stick. An Outlook draft file was downloaded instead.";
+        return;
+      }
+      const outlook = window.open(outlookComposeUrl(subject, week), "_blank");
+      status.textContent = outlook
+        ? "Formatted mail copied. In the Outlook draft, select all and paste with Cmd+V."
+        : "Formatted mail copied. Allow pop-ups, open Outlook, select all, and paste with Cmd+V.";
     });
 
     document.getElementById("emailWeekBtn").addEventListener("click", () => {
