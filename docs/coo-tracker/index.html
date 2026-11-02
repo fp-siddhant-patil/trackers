@@ -190,9 +190,22 @@
       color: var(--story);
     }
     .section[data-id="done"] .status,
-    .section[data-id="highlights"] .status { color: var(--accent); }
+    .section[data-id="highlights"] .status,
+    .section[data-id="security"] .status { color: var(--accent); }
     .section[data-id="progress"] .status,
     .section[data-id="design"] .status { color: var(--story); }
+    .sec {
+      display: inline-block;
+      margin-right: 0.35rem;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #07110d;
+      background: #f5c451;
+      border-radius: 999px;
+      padding: 0.1rem 0.45rem;
+    }
     .sheet-link { font-size: 0.88rem; }
     .section ul {
       margin: 0.85rem 0 0 1.1rem;
@@ -225,30 +238,39 @@
     <header>
       <h1>COO <span>Tracker</span></h1>
       <p class="lede">
-        From the Weekly Reports sheet. Pick a month, then the week. Weeks with nothing on the sheet stay hidden.
+        26 Oct – 1 Nov, by pod: DSA, App, Web, and Design. Security fixes are marked in yellow.
       </p>
       <p class="updated" id="updated"></p>
     </header>
 
+    <div class="months" id="pods" role="tablist" aria-label="Pods"></div>
     <div class="months" id="months" role="tablist" aria-label="Months"></div>
     <div class="tabs" id="tabs" role="tablist" aria-label="Weeks"></div>
     <div class="stats" id="stats"></div>
     <p class="summary" id="summary"></p>
     <div id="sections"></div>
     <p class="how">
-      Weeks come from dates on the Weekly Reports sheet. A week with no rows is not shown.
+      Share one pod at a time. Security rows stay marked inside that pod.
     </p>
   </div>
 
-  <script src="data.js?v=2026-11-02-last-oct"></script>
+  <script src="data.js?v=2026-11-02-pods"></script>
   <script>
     const data = window.COO_TRACKER;
     if (!data || !data.weeks || !data.weeks.length) {
       document.getElementById("summary").textContent =
         "Tracker data did not load. Refresh, or open /coo-tracker/ with the trailing slash.";
     } else {
+    const PODS = [
+      { id: "all", label: "All" },
+      { id: "dsa", label: "DSA" },
+      { id: "app", label: "App" },
+      { id: "web", label: "Web" },
+      { id: "design", label: "Design" }
+    ];
     let activeMonth = "2026-10";
     let activeId = "";
+    let activePod = "all";
 
     function fmtDate(iso) {
       return new Date(iso + "T00:00:00").toLocaleDateString("en-IN", {
@@ -304,7 +326,57 @@
     }
 
     function itemCount(week) {
-      return (week.sections || []).reduce((n, section) => n + (section.items ? section.items.length : 0), 0);
+      return (week.pods || []).reduce((n, pod) => n + (pod.items ? pod.items.length : 0), 0);
+    }
+
+    function itemLine(item) {
+      const tag = item.security ? '<span class="sec">Security</span>' : "";
+      return "<li>" + tag + item.what + (item.key ? " " + ticketLink(item.key) : "") + "</li>";
+    }
+
+    function podSections(week) {
+      const pods = (week.pods || []).filter((pod) => activePod === "all" || pod.id === activePod);
+      const security = [];
+      pods.forEach((pod) => {
+        (pod.items || []).forEach((item) => {
+          if (item.security) security.push(Object.assign({ pod: pod.title }, item));
+        });
+      });
+      const blocks = [];
+      if (security.length) {
+        blocks.push({
+          id: "security",
+          title: "Security fixes",
+          status: activePod === "all" ? "Across pods" : pods[0].title,
+          items: security.map((item) => ({
+            what: (activePod === "all" ? item.pod + ": " : "") + item.what,
+            key: item.key,
+            security: true
+          }))
+        });
+      }
+      pods.forEach((pod) => {
+        const groups = [];
+        (pod.items || []).forEach((item) => {
+          if (item.security) return;
+          const status = item.status || "Update";
+          let group = groups.find((entry) => entry.status === status);
+          if (!group) {
+            group = { status: status, items: [] };
+            groups.push(group);
+          }
+          group.items.push(item);
+        });
+        groups.forEach((group) => {
+          blocks.push({
+            id: group.status === "Done" ? "done" : "progress",
+            title: pod.title + " — " + group.status.toLowerCase(),
+            status: group.status,
+            items: group.items
+          });
+        });
+      });
+      return blocks;
     }
 
     function htmlList(sections) {
@@ -313,11 +385,17 @@
           "<h2>" + section.title + "</h2>" +
           '<div class="status">' + section.status + "</div>" +
           "<ul>" +
-            (section.items || []).map((item) => (
-              "<li>" + item.what + (item.key ? " " + ticketLink(item.key) : "") + "</li>"
-            )).join("") +
+            (section.items || []).map(itemLine).join("") +
           "</ul>" +
         "</section>"
+      )).join("");
+    }
+
+    function renderPods() {
+      document.getElementById("pods").innerHTML = PODS.map((pod) => (
+        '<button type="button" role="tab" data-pod="' + pod.id + '" aria-selected="' + (pod.id === activePod) + '">' +
+          pod.label +
+        "</button>"
       )).join("");
     }
 
@@ -345,17 +423,15 @@
     }
 
     function renderWeek(week) {
-      const sections = week.sections || [];
-      document.getElementById("summary").textContent = week.summary || "";
-      const points = week.highlights || [];
-      const highlightBlock = points.length
-        ? '<section class="section" data-id="highlights">' +
-            "<h2>This week</h2>" +
-            '<div class="status">' + week.range + "</div>" +
-            "<ul>" + points.map((point) => "<li>" + point + "</li>").join("") + "</ul>" +
-          "</section>"
-        : "";
-      document.getElementById("sections").innerHTML = highlightBlock + htmlList(sections);
+      const pods = (week.pods || []).filter((pod) => activePod === "all" || pod.id === activePod);
+      const summary = activePod === "all"
+        ? week.summary
+        : (pods[0] && pods[0].summary) || week.summary;
+      document.getElementById("summary").textContent = summary || "";
+      const sections = podSections(week);
+      document.getElementById("sections").innerHTML = sections.length
+        ? htmlList(sections)
+        : '<p class="empty">No updates for this pod in the week.</p>';
       renderStats(sections);
     }
 
@@ -366,10 +442,18 @@
         activeId = weeks.length ? weeks[weeks.length - 1].id : "";
       }
       document.getElementById("updated").textContent = "Updated " + fmtDate(data.updated);
+      renderPods();
       renderMonths();
       renderTabs();
       renderWeek(activeWeek());
     }
+
+    document.getElementById("pods").addEventListener("click", (event) => {
+      const btn = event.target.closest("button[data-pod]");
+      if (!btn) return;
+      activePod = btn.dataset.pod;
+      render();
+    });
 
     document.getElementById("months").addEventListener("click", (event) => {
       const btn = event.target.closest("button[data-month]");
