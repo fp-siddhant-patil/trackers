@@ -291,7 +291,7 @@
     </p>
   </div>
 
-  <script src="data.js?v=2026-11-02-outlook-copy"></script>
+  <script src="data.js?v=2026-11-02-outlook-mail"></script>
   <script>
     const data = window.COO_TRACKER;
     if (!data || !data.weeks || !data.weeks.length) {
@@ -447,49 +447,49 @@
       return "#3d4f46";
     }
 
+    function emailDocument(fragment) {
+      return "<!DOCTYPE html><html><head><meta charset=\"utf-8\"></head><body style=\"margin:0;padding:20px 24px;background:#ffffff;\">" +
+        fragment +
+        "</body></html>";
+    }
+
     function emailHtml(week) {
       const link = weekLink(week);
+      const font = "Calibri,Arial,sans-serif";
       const pods = (week.pods || []).map((pod) => {
         if (!pod.items || !pod.items.length) return "";
-        const rows = (pod.items || []).map((item) => {
+        const count = pod.items.length;
+        const items = pod.items.map((item) => {
+          const color = statusColor(item.status);
+          const status = item.status
+            ? '<b><font color="' + color + '">' + esc(item.status) + "</font></b>"
+            : "";
           const security = item.security
-            ? '<span style="display:inline-block;background:#f5c451;color:#07110d;font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;border-radius:999px;padding:2px 8px;margin-right:6px;">Security</span>'
+            ? (status ? ' <font color="#8a5a00"><b>· Security</b></font>' : '<font color="#8a5a00"><b>Security</b></font>')
             : "";
           const key = item.key
-            ? ' <a href="' + esc(data.jiraBase + "/" + encodeURIComponent(item.key)) + '" style="color:#0b6b3a;font-weight:700;text-decoration:none;">' + esc(item.key) + "</a>"
+            ? ' <a href="' + esc(data.jiraBase + "/" + encodeURIComponent(item.key)) + '" style="color:#14804a;font-weight:bold;">' + esc(item.key) + "</a>"
             : "";
-          const status = item.status
-            ? '<div style="margin-top:6px;font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:' + statusColor(item.status) + ';">' + esc(item.status) + "</div>"
-            : "";
-          return '<tr><td style="padding:12px 16px;border-top:1px solid #e4eee8;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.45;color:#14241c;">' +
-            security + esc(item.what) + key + status + "</td></tr>";
+          const head = (status || security) ? status + security + "<br>" : "";
+          return '<p style="margin:12px 0 0;padding:1px 0 1px 12px;border-left:3px solid ' + color + ";font-family:" + font + ';font-size:15px;line-height:1.45;color:#1c1c1c;">' +
+            head + esc(item.what) + key + "</p>";
         }).join("");
-        const summary = pod.summary
-          ? '<tr><td style="padding:0 8px 8px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.45;color:#3d5248;">' + esc(pod.summary) + "</td></tr>"
-          : "";
-        return '<tr><td style="padding:18px 8px 6px;font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:700;color:#07110d;">' + esc(pod.title) + "</td></tr>" +
-          summary +
-          '<tr><td style="padding:0 8px 8px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #d5e6dc;background:#ffffff;">' +
-            rows +
-          "</table></td></tr>";
+        return '<p style="margin:26px 0 0;padding:0 0 6px;border-bottom:2px solid #d5e8dc;font-family:' + font + ';font-size:18px;line-height:1.3;font-weight:bold;color:#111111;">' +
+          esc(pod.title) +
+          ' <span style="font-size:13px;font-weight:normal;color:#6d7f76;">' + count + (count === 1 ? " update" : " updates") + "</span></p>" +
+          items;
       }).join("");
 
-      return '<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f3f7f4;">' +
-        "<!--StartFragment-->" +
-        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f7f4;"><tr><td align="center" style="padding:24px 12px;">' +
-        '<table role="presentation" width="640" cellpadding="0" cellspacing="0" style="width:100%;max-width:640px;">' +
-        '<tr><td style="background:#07110d;padding:28px 28px 22px;font-family:Arial,Helvetica,sans-serif;">' +
-        '<div style="font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#3dd68c;">Siddhant Team</div>' +
-        '<div style="margin-top:8px;font-size:28px;line-height:1.15;font-weight:700;color:#ffffff;">Engineering update</div>' +
-        '<div style="margin-top:8px;font-size:16px;color:#cfe6d8;">' + esc(week.range) + "</div>" +
-        "</td></tr>" +
-        '<tr><td style="background:#ffffff;padding:22px 20px 8px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#24362d;">' + esc(week.summary || "") + "</td></tr>" +
-        '<tr><td style="background:#ffffff;padding:8px 20px 4px;font-family:Arial,Helvetica,sans-serif;font-size:14px;"><a href="' + esc(link) + '" style="color:#0b6b3a;font-weight:700;">Open this week on the tracker</a></td></tr>' +
-        '<tr><td style="background:#ffffff;padding:8px 12px 24px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">' + pods + "</table></td></tr>" +
-        '<tr><td style="background:#07110d;padding:16px 28px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#93b0a2;">Siddhant Team engineering tracker</td></tr>' +
-        "</table></td></tr></table>" +
-        "<!--EndFragment-->" +
-        "</body></html>";
+      return '<div style="font-family:' + font + ';font-size:15px;line-height:1.5;color:#1c1c1c;max-width:640px;">' +
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:640px;border-collapse:collapse;"><tr><td height="4" bgcolor="#14804a" style="background:#14804a;font-size:0;line-height:4px;">&nbsp;</td></tr></table>' +
+        '<p style="margin:16px 0 0;font-family:' + font + ';font-size:12px;line-height:1.3;font-weight:bold;letter-spacing:0.08em;color:#14804a;">SIDDHANT TEAM</p>' +
+        '<p style="margin:4px 0 0;font-family:' + font + ';font-size:22px;line-height:1.25;font-weight:bold;color:#111111;">Engineering update</p>' +
+        '<p style="margin:2px 0 0;font-family:' + font + ';font-size:15px;line-height:1.4;color:#5c6b63;">' + esc(week.range) + "</p>" +
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:640px;margin-top:14px;border-collapse:collapse;"><tr><td bgcolor="#f3faf6" style="background:#f3faf6;padding:12px 14px;font-family:' + font + ';font-size:15px;line-height:1.5;color:#24302b;">' + esc(week.summary || "") + "</td></tr></table>" +
+        '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:14px;"><tr><td bgcolor="#14804a" style="background:#14804a;padding:10px 16px;"><a href="' + esc(link) + '" style="color:#ffffff;font-family:' + font + ';font-size:14px;font-weight:bold;text-decoration:none;"><font color="#ffffff" face="Calibri, Arial, sans-serif">Open this week on the tracker</font></a></td></tr></table>' +
+        pods +
+        '<p style="margin:26px 0 0;font-family:' + font + ';font-size:12px;line-height:1.4;color:#7d8c84;">Siddhant Team engineering tracker</p>' +
+        "</div>";
     }
 
     function outlookComposeUrl(subject, week) {
@@ -536,7 +536,7 @@
         "Content-Transfer-Encoding: 8bit",
         "Subject: " + encodedSubject,
         "",
-        html
+        emailDocument(html)
       ].join("\r\n");
       const link = document.createElement("a");
       link.href = URL.createObjectURL(new Blob([eml], { type: "message/rfc822" }));
