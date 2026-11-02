@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>COO Tracker</title>
+  <title>Siddhant Team — Engineering Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Figtree:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -38,6 +38,14 @@
       line-height: 0.95;
     }
     h1 span { color: var(--accent); }
+    .team {
+      margin-bottom: 0.35rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
     .lede { margin-top: 0.75rem; color: var(--muted); max-width: 40rem; line-height: 1.55; }
     .updated {
       margin-top: 0.55rem;
@@ -236,7 +244,8 @@
   <div class="wrap">
     <a class="back" href="../index.html">← Engineering Trackers</a>
     <header>
-      <h1>COO <span>Tracker</span></h1>
+      <p class="team">Siddhant Team</p>
+      <h1>Engineering <span>Tracker</span></h1>
       <p class="lede">
         Pick the month, then the week. That week is listed below by pod: DSA, App, Web, and Design. Security fixes are marked in yellow.
       </p>
@@ -253,7 +262,7 @@
     </p>
   </div>
 
-  <script src="data.js?v=2026-11-02-pods-only"></script>
+  <script src="data.js?v=2026-11-02-siddhant-team"></script>
   <script>
     const data = window.COO_TRACKER;
     if (!data || !data.weeks || !data.weeks.length) {
