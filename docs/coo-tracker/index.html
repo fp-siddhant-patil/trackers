@@ -227,6 +227,25 @@
       margin-left: 0.35rem;
       white-space: nowrap;
     }
+    .share {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .btn-mail {
+      appearance: none;
+      border: 0;
+      background: var(--accent);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 0.65rem 1.1rem;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .email-status { color: var(--muted); font-size: 0.88rem; }
     .how {
       margin-top: 1.6rem;
       color: var(--muted);
@@ -247,30 +266,36 @@
       <p class="team">Siddhant Team</p>
       <h1>Engineering <span>Tracker</span></h1>
       <p class="lede">
-        Pick the month, then the week. That week is listed below by pod: DSA, App, Web, and Design. Security fixes are marked in yellow.
+        Pick the month, then the week. Email this week opens a mail with the pod update and a link to this page.
       </p>
       <p class="updated" id="updated"></p>
     </header>
 
     <div class="months" id="months" role="tablist" aria-label="Months"></div>
     <div class="tabs" id="tabs" role="tablist" aria-label="Weeks"></div>
+    <div class="share">
+      <button type="button" id="emailWeekBtn" class="btn-mail">Email this week</button>
+      <p id="emailStatus" class="email-status" role="status"></p>
+    </div>
     <div class="stats" id="stats"></div>
     <p class="summary" id="summary"></p>
     <div id="sections"></div>
     <p class="how">
-      The week filter stays on top. Under the selected week, updates are grouped by pod.
+      Email this week copies the update and opens your mail with the tracker link. If the mail draft is short, paste the copied update into the body.
     </p>
   </div>
 
-  <script src="data.js?v=2026-11-02-siddhant-team"></script>
+  <script src="data.js?v=2026-11-02-email"></script>
   <script>
     const data = window.COO_TRACKER;
     if (!data || !data.weeks || !data.weeks.length) {
       document.getElementById("summary").textContent =
         "Tracker data did not load. Refresh, or open /coo-tracker/ with the trailing slash.";
     } else {
-    let activeMonth = "2026-10";
-    let activeId = "";
+    const TRACKER_URL = "https://fp-siddhant-patil.github.io/trackers/coo-tracker/";
+    let activeId = (location.hash || "").replace("#", "");
+    const hashedWeek = data.weeks.find((week) => week.id === activeId);
+    let activeMonth = (hashedWeek && hashedWeek.month) || "2026-10";
 
     function fmtDate(iso) {
       return new Date(iso + "T00:00:00").toLocaleDateString("en-IN", {
@@ -394,17 +419,65 @@
       })));
     }
 
+    function weekLink(week) {
+      return TRACKER_URL + "#" + encodeURIComponent(week.id);
+    }
+
+    function emailBody(week) {
+      const lines = [
+        "Siddhant Team — Engineering update",
+        week.range,
+        "",
+        "Tracker: " + weekLink(week),
+        ""
+      ];
+      (week.pods || []).forEach((pod) => {
+        lines.push(pod.title);
+        (pod.items || []).forEach((item) => {
+          const mark = item.security ? " [Security]" : "";
+          const key = item.key ? " (" + item.key + ")" : "";
+          const status = item.status ? " — " + item.status : "";
+          lines.push("-" + mark + " " + item.what + key + status);
+        });
+        lines.push("");
+      });
+      return lines.join("\n").trim();
+    }
+
     function render() {
       if (months().indexOf(activeMonth) === -1) activeMonth = months()[0];
       const weeks = weeksInMonth(activeMonth);
       if (!weeks.some((week) => week.id === activeId)) {
         activeId = weeks.length ? weeks[weeks.length - 1].id : "";
       }
+      const week = activeWeek();
+      if (week && week.id) history.replaceState(null, "", "#" + week.id);
       document.getElementById("updated").textContent = "Updated " + fmtDate(data.updated);
       renderMonths();
       renderTabs();
-      renderWeek(activeWeek());
+      renderWeek(week);
     }
+
+    document.getElementById("emailWeekBtn").addEventListener("click", () => {
+      const week = activeWeek();
+      const subject = "Siddhant Team engineering update — " + week.range;
+      const body = emailBody(week);
+      const status = document.getElementById("emailStatus");
+      const copied = navigator.clipboard && navigator.clipboard.writeText
+        ? navigator.clipboard.writeText("Subject: " + subject + "\n\n" + body)
+        : Promise.reject();
+      copied.then(() => {
+        status.textContent = "Update copied. A mail draft is opening with the tracker link.";
+      }).catch(() => {
+        status.textContent = "A mail draft is opening with the tracker link.";
+      });
+      const full = "mailto:?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+      const shortBody = "Weekly update for " + week.range + ".\n\nThe full update is copied. Paste it here if this draft is empty.\n\nTracker: " + weekLink(week);
+      const mail = full.length < 1800
+        ? full
+        : "mailto:?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(shortBody);
+      window.location.href = mail;
+    });
 
     document.getElementById("months").addEventListener("click", (event) => {
       const btn = event.target.closest("button[data-month]");
