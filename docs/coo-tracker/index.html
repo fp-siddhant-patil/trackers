@@ -53,6 +53,29 @@
       border-radius: 1rem;
       padding: 1rem 1.1rem;
     }
+    .months {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .months button {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 0.65rem 1.15rem;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .months button[aria-selected="true"] {
+      color: var(--accent);
+      border-color: rgba(61, 214, 140, 0.7);
+      outline: 1px solid rgba(61, 214, 140, 0.35);
+    }
+    .months.is-off { display: none; }
     .switch {
       display: flex;
       gap: 0.5rem;
@@ -166,13 +189,10 @@
       text-transform: uppercase;
       color: var(--story);
     }
-    .section[data-id="live"] .status,
-    .section[data-id="web-done"] .status,
-    .section[data-id="web-live"] .status,
-    .section[data-id="revamp-done"] .status { color: var(--accent); }
-    .section[data-id="web-built"] .status,
-    .section[data-id="tpap"] .status { color: var(--story); }
+    .section[data-id="done"] .status,
     .section[data-id="highlights"] .status { color: var(--accent); }
+    .section[data-id="progress"] .status,
+    .section[data-id="design"] .status { color: var(--story); }
     .sheet-link { font-size: 0.88rem; }
     .section ul {
       margin: 0.85rem 0 0 1.1rem;
@@ -205,43 +225,30 @@
     <header>
       <h1>COO <span>Tracker</span></h1>
       <p class="lede">
-        Choose Weekly for the must-mention update, or switch to App, Web frontend, or App revamp.
+        From the Weekly Reports sheet. Pick a month, then the week. Weeks with nothing on the sheet stay hidden.
       </p>
       <p class="updated" id="updated"></p>
     </header>
 
-    <div class="switch" id="switch" role="tablist" aria-label="Weekly, app, web, or revamp"></div>
+    <div class="months" id="months" role="tablist" aria-label="Months"></div>
     <div class="tabs" id="tabs" role="tablist" aria-label="Weeks"></div>
     <div class="stats" id="stats"></div>
     <p class="summary" id="summary"></p>
     <div id="sections"></div>
     <p class="how">
-      Weekly: edit <code>highlights</code> and <code>summaryAll</code> on the week in <code>docs/coo-tracker/data.js</code>.
-      App and web sections sit under that. App revamp follows the module Google Sheet.
+      Weeks come from dates on the Weekly Reports sheet. A week with no rows is not shown.
     </p>
   </div>
 
-  <script src="data.js?v=2026-11-01-week"></script>
+  <script src="data.js?v=2026-11-02-sheet"></script>
   <script>
     const data = window.COO_TRACKER;
     if (!data || !data.weeks || !data.weeks.length) {
       document.getElementById("summary").textContent =
         "Tracker data did not load. Refresh, or open /coo-tracker/ with the trailing slash.";
     } else {
-    const hashStream = (location.hash || "").replace("#", "");
-    let activeId = data.weeks[0].id;
-    let stream = (hashStream === "web" || hashStream === "revamp" || hashStream === "app")
-      ? hashStream
-      : "week";
-    let revampRows = (data.revamp && data.revamp.rows) ? data.revamp.rows.slice() : [];
-    let revampLive = false;
-
-    const STREAMS = [
-      { id: "week", label: "Weekly" },
-      { id: "app", label: "App" },
-      { id: "web", label: "Web frontend" },
-      { id: "revamp", label: "App revamp" }
-    ];
+    let activeMonth = "2026-10";
+    let activeId = "";
 
     function fmtDate(iso) {
       return new Date(iso + "T00:00:00").toLocaleDateString("en-IN", {
@@ -254,114 +261,50 @@
       return '<a href="' + data.jiraBase + "/" + encodeURIComponent(key) + '" target="_blank" rel="noreferrer">' + key + "</a>";
     }
 
+    function weekHasUpdates(week) {
+      const highlights = week.highlights ? week.highlights.length : 0;
+      const items = (week.sections || []).reduce((n, section) => n + (section.items ? section.items.length : 0), 0);
+      return highlights + items > 0;
+    }
+
+    function monthKey(week) {
+      return week.month || String(week.id || "").slice(0, 7);
+    }
+
+    function monthLabel(key) {
+      const parts = String(key).split("-");
+      const date = new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
+      return date.toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+    }
+
+    function months() {
+      const seen = [];
+      data.weeks.forEach((week) => {
+        if (!weekHasUpdates(week)) return;
+        const key = monthKey(week);
+        if (seen.indexOf(key) === -1) seen.push(key);
+      });
+      seen.sort();
+      const october = seen.indexOf("2026-10");
+      if (october > 0) {
+        seen.splice(october, 1);
+        seen.unshift("2026-10");
+      }
+      return seen;
+    }
+
+    function weeksInMonth(key) {
+      return data.weeks
+        .filter((week) => monthKey(week) === key && weekHasUpdates(week))
+        .sort((a, b) => a.id.localeCompare(b.id));
+    }
+
     function activeWeek() {
-      return data.weeks.find((week) => week.id === activeId) || data.weeks[0];
+      return data.weeks.find((week) => week.id === activeId) || weeksInMonth(activeMonth)[0] || data.weeks[0];
     }
 
-    function sectionStream(section) {
-      if (section.stream === "web" || section.stream === "app") return section.stream;
-      const id = String(section.id || "");
-      const title = String(section.title || "");
-      if (id.indexOf("web") === 0 || /web|frontend|website/i.test(title)) return "web";
-      return "app";
-    }
-
-    function streamSections(week) {
-      if (stream === "week") return week.sections || [];
-      return week.sections.filter((section) => sectionStream(section) === stream);
-    }
-
-    function itemCount(week, streamId) {
-      if (streamId === "revamp") return revampRows.length;
-      if (streamId === "week") {
-        const points = week.highlights && week.highlights.length
-          ? week.highlights.length
-          : (week.sections || []).reduce((n, section) => n + (section.items ? section.items.length : 0), 0);
-        return points;
-      }
-      return week.sections
-        .filter((section) => sectionStream(section) === streamId)
-        .reduce((n, section) => n + (section.items ? section.items.length : 0), 0);
-    }
-
-    function statusBucket(status) {
-      const value = String(status || "").trim().toLowerCase();
-      if (value === "done" || value === "complete" || value === "completed") return "done";
-      if (value === "in progress" || value === "in-progress" || value === "wip" || value === "qa") return "progress";
-      return "queued";
-    }
-
-    function rowLabel(row) {
-      const moduleName = String(row.module || "").trim();
-      const sub = String(row.sub || "").trim();
-      if (moduleName && sub) return moduleName + " — " + sub;
-      return moduleName || sub;
-    }
-
-    function normalizeRevampRows(rows) {
-      const out = [];
-      let lastModule = "";
-      (rows || []).forEach((row) => {
-        const rawModule = String(row.module || "").trim();
-        const sub = String(row.sub || "").trim();
-        if (rawModule) lastModule = rawModule;
-        const moduleName = rawModule || lastModule;
-        if (!moduleName && !sub) return;
-        out.push({
-          module: moduleName,
-          sub: sub,
-          key: String(row.key || "").trim(),
-          status: String(row.status || "").trim() || "Not started"
-        });
-      });
-      return out;
-    }
-
-    function revampCounts() {
-      const counts = { done: 0, progress: 0, queued: 0 };
-      revampRows.forEach((row) => { counts[statusBucket(row.status)] += 1; });
-      return counts;
-    }
-
-    function revampSections() {
-      const groups = {
-        done: { id: "revamp-done", title: "Done", status: "Rebuild complete", items: [] },
-        progress: { id: "revamp-progress", title: "In progress", status: "Being rebuilt", items: [] },
-        queued: { id: "revamp-queued", title: "Not started", status: "Queued", items: [] }
-      };
-      revampRows.forEach((row) => {
-        groups[statusBucket(row.status)].items.push({
-          what: rowLabel(row),
-          key: row.key
-        });
-      });
-      return ["done", "progress", "queued"].map((key) => groups[key]).filter((section) => section.items.length);
-    }
-
-    function rowsFromGviz(res) {
-      if (!res || !res.table || !res.table.cols || !res.table.rows) return [];
-      const labels = res.table.cols.map((col) => String((col && (col.label || col.id)) || "").toLowerCase());
-      function idx(names) {
-        for (let i = 0; i < names.length; i += 1) {
-          const found = labels.indexOf(names[i]);
-          if (found >= 0) return found;
-        }
-        return -1;
-      }
-      const moduleIdx = idx(["module name", "module"]);
-      const subIdx = idx(["sub module name", "submodule", "sub module"]);
-      const jiraIdx = idx(["jira", "ticket", "key"]);
-      const statusIdx = idx(["status"]);
-      function cell(row, index) {
-        if (index < 0 || !row.c || !row.c[index] || row.c[index].v == null) return "";
-        return String(row.c[index].v).trim();
-      }
-      return normalizeRevampRows(res.table.rows.map((row) => ({
-        module: cell(row, moduleIdx),
-        sub: cell(row, subIdx),
-        key: cell(row, jiraIdx),
-        status: cell(row, statusIdx)
-      })));
+    function itemCount(week) {
+      return (week.sections || []).reduce((n, section) => n + (section.items ? section.items.length : 0), 0);
     }
 
     function htmlList(sections) {
@@ -378,23 +321,19 @@
       )).join("");
     }
 
-    function renderTabs() {
-      const tabs = document.getElementById("tabs");
-      tabs.classList.toggle("is-off", stream === "revamp");
-      tabs.innerHTML = data.weeks.map((week) => (
-        '<button class="tab" role="tab" data-id="' + week.id + '" aria-selected="' + (week.id === activeId) + '">' +
-          '<div class="when">' + week.range + "</div>" +
-          '<div class="meta">Weekly ' + itemCount(week, "week") + " · App " + itemCount(week, "app") + " · Web " + itemCount(week, "web") + "</div>" +
-          '<div class="pill">' + week.label + "</div>" +
+    function renderMonths() {
+      document.getElementById("months").innerHTML = months().map((key) => (
+        '<button type="button" role="tab" data-month="' + key + '" aria-selected="' + (key === activeMonth) + '">' +
+          monthLabel(key) +
         "</button>"
       )).join("");
     }
 
-    function renderSwitch() {
-      const week = activeWeek();
-      document.getElementById("switch").innerHTML = STREAMS.map((item) => (
-        '<button type="button" data-stream="' + item.id + '" aria-selected="' + (item.id === stream) + '">' +
-          item.label + " (" + itemCount(week, item.id) + ")" +
+    function renderTabs() {
+      document.getElementById("tabs").innerHTML = weeksInMonth(activeMonth).map((week) => (
+        '<button class="tab" role="tab" data-id="' + week.id + '" aria-selected="' + (week.id === activeId) + '">' +
+          '<div class="when">' + week.range + "</div>" +
+          '<div class="meta">' + itemCount(week) + " updates</div>" +
         "</button>"
       )).join("");
     }
@@ -405,100 +344,41 @@
       )).join("");
     }
 
-    function renderWeekView(week, sections) {
-      const summary = stream === "web"
-        ? week.summaryWeb
-        : stream === "week"
-          ? (week.summaryAll || [week.summaryApp, week.summaryWeb].filter(Boolean).join(" "))
-          : week.summaryApp;
-      document.getElementById("summary").textContent = summary || week.summary || "";
-      if (stream === "week") {
-        const points = week.highlights || [];
-        const highlightBlock = points.length
-          ? '<section class="section" data-id="highlights">' +
-              "<h2>Must mention this week</h2>" +
-              '<div class="status">Weekly update</div>' +
-              "<ul>" + points.map((point) => "<li>" + point + "</li>").join("") + "</ul>" +
-            "</section>"
-          : "";
-        if (!points.length && !sections.length) {
-          document.getElementById("sections").innerHTML =
-            '<p class="empty">No weekly updates in this week. Add highlights on the week in data.js.</p>';
-          return;
-        }
-        document.getElementById("sections").innerHTML = highlightBlock + htmlList(sections);
-        return;
-      }
-      if (!sections.length) {
-        document.getElementById("sections").innerHTML =
-          '<p class="empty">No ' + (stream === "web" ? "web frontend" : "app") + " updates in this week.</p>";
-        return;
-      }
-      document.getElementById("sections").innerHTML = htmlList(sections);
-    }
-
-    function renderRevampView() {
-      const counts = revampCounts();
-      const sheetUrl = data.revamp && data.revamp.sheetUrl ? data.revamp.sheetUrl : "";
-      const source = revampLive
-        ? "Live from the module sheet."
-        : "Snapshot from the module sheet (" + fmtDate((data.revamp && data.revamp.pulled) || data.updated) + ").";
-      document.getElementById("summary").innerHTML =
-        (data.revamp && data.revamp.summary ? data.revamp.summary + " " : "") +
-        source +
-        (sheetUrl ? ' <a class="sheet-link" href="' + sheetUrl + '" target="_blank" rel="noreferrer">Open sheet</a>' : "");
-      renderStats([
-        { title: "Done", status: String(counts.done) },
-        { title: "In progress", status: String(counts.progress) },
-        { title: "Not started", status: String(counts.queued) }
-      ]);
-      const sections = revampSections();
-      document.getElementById("sections").innerHTML = sections.length
-        ? htmlList(sections)
-        : '<p class="empty">No app revamp modules in the sheet yet.</p>';
+    function renderWeek(week) {
+      const sections = week.sections || [];
+      document.getElementById("summary").textContent = week.summary || "";
+      const points = week.highlights || [];
+      const highlightBlock = points.length
+        ? '<section class="section" data-id="highlights">' +
+            "<h2>This week</h2>" +
+            '<div class="status">' + week.range + "</div>" +
+            "<ul>" + points.map((point) => "<li>" + point + "</li>").join("") + "</ul>" +
+          "</section>"
+        : "";
+      document.getElementById("sections").innerHTML = highlightBlock + htmlList(sections);
+      renderStats(sections);
     }
 
     function render() {
+      if (months().indexOf(activeMonth) === -1) activeMonth = months()[0];
+      const weeks = weeksInMonth(activeMonth);
+      if (!weeks.some((week) => week.id === activeId)) {
+        activeId = weeks.length ? weeks[weeks.length - 1].id : "";
+      }
       document.getElementById("updated").textContent = "Updated " + fmtDate(data.updated);
-      renderSwitch();
+      renderMonths();
       renderTabs();
-      if (stream === "revamp") {
-        renderRevampView();
-        return;
-      }
-      const week = activeWeek();
-      const sections = streamSections(week);
-      if (stream === "week") {
-        renderStats([
-          { title: "Must mention", status: String((week.highlights || []).length) },
-          { title: "App", status: String(itemCount(week, "app")) },
-          { title: "Web frontend", status: String(itemCount(week, "web")) }
-        ]);
-      } else {
-        renderStats(sections);
-      }
-      renderWeekView(week, sections);
+      renderWeek(activeWeek());
     }
 
-    function loadRevampSheet() {
-      if (!data.revamp || !data.revamp.sheetId) return;
-      window.google = window.google || {};
-      window.google.visualization = window.google.visualization || {};
-      window.google.visualization.Query = window.google.visualization.Query || {};
-      window.google.visualization.Query.setResponse = function (res) {
-        const rows = rowsFromGviz(res);
-        if (!rows.length) return;
-        revampRows = rows;
-        revampLive = true;
-        render();
-      };
-      const script = document.createElement("script");
-      script.src = "https://docs.google.com/spreadsheets/d/" +
-        encodeURIComponent(data.revamp.sheetId) +
-        "/gviz/tq?gid=" + encodeURIComponent(data.revamp.gid || "0") +
-        "&tqx=out:json";
-      document.body.appendChild(script);
-    }
+    document.getElementById("months").addEventListener("click", (event) => {
+      const btn = event.target.closest("button[data-month]");
+      if (!btn) return;
+      activeMonth = btn.dataset.month;
+      const weeks = weeksInMonth(activeMonth);
+      activeId = weeks.length ? weeks[weeks.length - 1].id : "";
+      render();
+    });
 
     document.getElementById("tabs").addEventListener("click", (event) => {
       const tab = event.target.closest(".tab");
@@ -507,17 +387,7 @@
       render();
     });
 
-    document.getElementById("switch").addEventListener("click", (event) => {
-      const btn = event.target.closest("button[data-stream]");
-      if (!btn) return;
-      stream = btn.dataset.stream;
-      location.hash = stream;
-      render();
-    });
-
-    revampRows = normalizeRevampRows(revampRows);
     render();
-    loadRevampSheet();
     }
   </script>
 </body>

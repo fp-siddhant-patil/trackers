@@ -1,73 +1,118 @@
-/* COO week-wise tracker.
-   Each week: edit highlights[] (must-mention points) and summaryAll (combined blurb).
-   Then fill App/Web sections as usual. */
+/* COO tracker from Weekly Reports.xlsx only.
+   Weeks are Monday–Sunday. A week with no dated rows is omitted. */
 
 window.COO_TRACKER = {
   updated: "2026-11-02",
   jiraBase: "https://fatakpay.atlassian.net/browse",
-  revamp: {
-    title: "App revamp",
-    sheetUrl: "https://docs.google.com/spreadsheets/d/1pSMt9Vua2AD2v2WFfmHmT0Z7SDpfM4j4x0ykQfsR0CU/edit?pli=1&gid=0#gid=0",
-    sheetId: "1pSMt9Vua2AD2v2WFfmHmT0Z7SDpfM4j4x0ykQfsR0CU",
-    gid: "0",
-    pulled: "2026-08-24",
-    summary:
-      "App rebuild by module. Navigation is done. Onboarding, network, coin wallet, investments, and settings are in progress. The rest has not started.",
-    rows: [
-      { module: "Navigation Stack Architecture", sub: "", key: "", status: "Done" },
-      { module: "Onboarding", sub: "Login Flow", key: "", status: "In Progress" },
-      { module: "Network Layer", sub: "", key: "", status: "In Progress" },
-      { module: "Coin Wallet", sub: "", key: "", status: "In Progress" },
-      { module: "Investments", sub: "", key: "", status: "In Progress" },
-      { module: "Settings", sub: "Feedback & Ratings", key: "", status: "In Progress" },
-      { module: "Settings", sub: "Transaction History", key: "", status: "In Progress" },
-      { module: "UPI", sub: "", key: "", status: "Not started" },
-      { module: "Calculator", sub: "", key: "", status: "Not started" },
-      { module: "EMI Tracker", sub: "", key: "", status: "Not started" },
-      { module: "Dashboard", sub: "", key: "", status: "Not started" },
-      { module: "Loans", sub: "", key: "", status: "Not started" },
-      { module: "BBPS", sub: "", key: "", status: "Not started" },
-      { module: "Fatak-Udaan", sub: "", key: "", status: "Not started" },
-      { module: "Insurance", sub: "", key: "", status: "Not started" },
-      { module: "Financial Wellness", sub: "", key: "", status: "Not started" },
-      { module: "Membership", sub: "", key: "", status: "Not started" },
-      { module: "Refer & Earn", sub: "", key: "", status: "Not started" },
-      { module: "Coupons", sub: "", key: "", status: "Not started" },
-      { module: "Settings", sub: "", key: "", status: "Not started" },
-      { module: "Credit Card", sub: "", key: "", status: "Not started" }
-    ]
-  },
   weeks: [
     {
-      id: "2026-11-01",
-      range: "26 Oct – 1 Nov 2026",
-      title: "Last week",
-      label: "Latest",
-      summaryApp:
-        "Last week the Ignosis pass key and the compliance location-consent change were done. PayU NACH and PAN/DOB for account-aggregator consent were in progress. App OTP resend stayed in testing. JWT and in-app promotion had not started.",
-      summaryWeb:
-        "Last week DSA video KYC expiry and insurance payment retry were done. PayU NACH and PAN/DOB consent were in progress. Two insurance items were ready for QA. Coupon code was still waiting on JWT.",
-      summaryAll:
-        "Last week: Ignosis pass key and location consent were done on the app, DSA video KYC expiry and insurance payment retry were done on web, and PayU NACH plus PAN/DOB consent were in progress on both.",
+      id: "2026-09-06",
+      month: "2026-09",
+      range: "31 Aug – 6 Sep 2026",
+      label: "1 Sep",
+      summary:
+        "GoDigit still shows a different final premium when the user goes to pay. Open since 1 Sep. Not started.",
       highlights: [
-        "App done: Ignosis pass key (29 Oct), and location consent updated for compliance (28 Oct).",
-        "Web done: DSA video KYC link can be expired from admin (29 Oct). Insurance users can pay again after a failed payment (28–29 Oct).",
-        "PayU NACH started on web and app on 30 Oct. Timeline is 2 Nov.",
-        "PAN and DOB for account-aggregator consent (Ignosis, FinFactor, FinBox, CAMS) were in sanity and testing. Deadline was 31 Oct.",
-        "Insurance ready for QA: IDV/NCB dropdown opens only on the control itself (27 Oct), and net premium is on the breakup (30 Oct).",
-        "App OTP resend (FTK-14840) was still in testing. Web and DSA OTP resend had already shipped the week before.",
-        "Still open: web coupon code waiting on JWT, Diwali website banners (dev started, timeline 31 Oct), app JWT, in-app promotion, and NCB prefill on repeat login (29 Oct).",
-        "Desktop design on the report: onboarding and dashboard, FatakUdaan, Refer & Earn, membership, settings, and calculator are done. Loan journey and insurance need changes. Coupons need an internal discussion."
+        "Insurance, GoDigit: the final premium shown before payment changes when the user goes to pay. Not started since 1 Sep."
       ],
       sections: [
         {
-          id: "web-live",
-          stream: "web",
-          title: "Web — done last week",
-          status: "Done",
+          id: "queued",
+          title: "Not started",
+          status: "Assigned",
           items: [
             {
-              what: "DSA video KYC link can be expired from admin (29 Oct)."
+              what: "Insurance, GoDigit: the final premium shown before payment changes when the user goes to pay. Open since 1 Sep."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: "2026-10-18",
+      month: "2026-10",
+      range: "12–18 Oct 2026",
+      label: "16 Oct",
+      summary: "Reverse penny drop for UGRO Capital co-lending was updated on web.",
+      highlights: [
+        "Web done: reverse penny drop for UGRO Capital co-lending (16 Oct)."
+      ],
+      sections: [
+        {
+          id: "done",
+          title: "Done",
+          status: "Completed",
+          items: [
+            {
+              what: "Web: reverse penny drop for UGRO Capital co-lending is updated (16 Oct)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: "2026-10-25",
+      month: "2026-10",
+      range: "19–25 Oct 2026",
+      label: "19 Oct",
+      summary:
+        "FatakUdaan page revamp and 60-second OTP resend on backend, web, and DSA were done. Insurance vehicle details stay in place on Cancel. The app OTP change was still open.",
+      highlights: [
+        "Web done: FatakUdaan page revamped to the design reference (23 Oct).",
+        "60-second OTP resend is done on backend, web, and DSA (23 Oct). The app change was still open.",
+        "Insurance: vehicle details stay in place when the user clicks Cancel (21 Oct)."
+      ],
+      sections: [
+        {
+          id: "done",
+          title: "Done",
+          status: "Completed",
+          items: [
+            {
+              what: "Web: FatakUdaan page revamped to the design reference (23 Oct)."
+            },
+            {
+              key: "FTK-14840",
+              what: "60-second OTP resend is done on backend, web, and DSA (23 Oct). The app change was still open."
+            },
+            {
+              what: "Insurance: vehicle details stay in place when the user clicks Cancel (21 Oct)."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: "2026-11-01",
+      month: "2026-10",
+      range: "26 Oct – 1 Nov 2026",
+      label: "26 Oct",
+      summary:
+        "Ignosis pass key, location consent, DSA video KYC expiry, and insurance payment retry were done. PAN/DOB consent and two insurance fixes were in progress. Diwali banners and NCB prefill were still open.",
+      highlights: [
+        "App done: Ignosis pass key (29 Oct), and location consent updated for compliance (28 Oct).",
+        "DSA video KYC link can be expired from admin (29 Oct).",
+        "Insurance: after a payment fails, the user can pay again (28–29 Oct).",
+        "In progress: PAN and DOB in account-aggregator consent on web and app. Sanity and testing. Deadline 31 Oct.",
+        "Insurance ready for QA: IDV/NCB dropdown opens only on the control (27 Oct), and net premium is on the breakup (30 Oct).",
+        "Still open: Diwali website banners (31 Oct, dev started), and NCB percentage not prefilled on repeat login (29 Oct).",
+        "No date on the sheet: web coupon code waiting on JWT, app JWT, in-app promotion, and app OTP resend still in testing.",
+        "Desktop design: onboarding and dashboard, FatakUdaan, Refer & Earn, membership, settings, and calculator are done. Loan journey and insurance need changes. Coupons need an internal discussion."
+      ],
+      sections: [
+        {
+          id: "done",
+          title: "Done",
+          status: "Completed",
+          items: [
+            {
+              what: "App: Ignosis pass key is done (29 Oct)."
+            },
+            {
+              what: "App: location consent updated for compliance (28 Oct)."
+            },
+            {
+              what: "DSA: video KYC link can be expired from admin (29 Oct)."
             },
             {
               what: "Insurance: after a payment fails, the user can pay again (28–29 Oct)."
@@ -75,496 +120,85 @@ window.COO_TRACKER = {
           ]
         },
         {
-          id: "web-wip",
-          stream: "web",
-          title: "Web — in progress",
+          id: "progress",
+          title: "In progress",
           status: "In progress / QA",
           items: [
             {
-              what: "PayU NACH integration. Dev started 30 Oct. Timeline 2 Nov."
+              what: "Web and app: PAN and DOB are passed in the account-aggregator consent request (Ignosis, FinFactor, FinBox, CAMS). Sanity and testing are in progress. Deadline was 31 Oct."
             },
             {
-              what: "PAN and DOB are passed in the account-aggregator consent request (Ignosis, FinFactor, FinBox, CAMS). Sanity and testing are in progress. Deadline was 31 Oct."
+              what: "Insurance, ready for QA: the IDV or NCB dropdown opens only when the dropdown itself is clicked (27 Oct)."
             },
             {
-              what: "Insurance, ready for QA: the IDV or NCB dropdown on plan selection opens only when the dropdown itself is clicked, not the area beside it."
-            },
-            {
-              what: "Insurance, ready for QA: net premium is added on the premium breakup from the quotes summary API."
-            }
-          ]
-        },
-        {
-          id: "web-queued",
-          stream: "web",
-          title: "Web — not started",
-          status: "Assigned",
-          items: [
-            {
-              what: "Web coupon code is waiting on JWT confirmation. Timeline is not set."
-            },
-            {
-              what: "Diwali campaign banners on the website. Dev has started. Timeline was 31 Oct."
-            },
-            {
-              what: "Insurance: logging in again with the same vehicle number does not show the prefilled NCB percentage (29 Oct)."
-            }
-          ]
-        },
-        {
-          id: "web-design",
-          stream: "web",
-          title: "Desktop web design",
-          status: "Design report",
-          items: [
-            {
-              what: "Done: onboarding and dashboard, FatakUdaan, Refer & Earn, membership, settings, and calculator."
-            },
-            {
-              what: "Changes required: loan journey and insurance."
-            },
-            {
-              what: "Coupons need an internal discussion."
-            }
-          ]
-        },
-        {
-          id: "live",
-          stream: "app",
-          title: "App — done last week",
-          status: "Done",
-          items: [
-            {
-              what: "Ignosis pass key is done."
-            },
-            {
-              what: "Location consent updated for compliance."
-            }
-          ]
-        },
-        {
-          id: "build",
-          stream: "app",
-          title: "App — in progress",
-          status: "In progress",
-          items: [
-            {
-              what: "PayU NACH integration. Dev started 30 Oct. Timeline 2 Nov."
-            },
-            {
-              what: "PAN and DOB are passed in the account-aggregator consent request (Ignosis, FinFactor, FinBox, CAMS). Sanity and testing are in progress. Deadline was 31 Oct."
+              what: "Insurance, ready for QA: net premium is added on the premium breakup from the quotes summary API (30 Oct)."
             },
             {
               key: "FTK-14840",
-              what: "60-second OTP resend on the app journey is in testing."
+              what: "App: 60-second OTP resend is in testing. No date on the sheet."
             }
           ]
         },
         {
-          id: "app-queued",
-          stream: "app",
-          title: "App — not started",
+          id: "queued",
+          title: "Not started",
           status: "Assigned",
           items: [
             {
-              what: "JWT on the app frontend. Timeline is not set."
+              what: "Web: Diwali campaign banners. Dev has started. Timeline was 31 Oct."
             },
             {
-              what: "In-app promotion. No timeline on the sheet."
+              what: "Insurance: logging in again with the same vehicle number does not show the prefilled NCB percentage (29 Oct)."
+            },
+            {
+              what: "Web: coupon code is waiting on JWT confirmation. No date on the sheet."
+            },
+            {
+              what: "App: JWT on the frontend. No date on the sheet."
+            },
+            {
+              what: "App: in-app promotion. No date on the sheet."
             }
           ]
         },
         {
-          id: "app-design",
-          stream: "app",
-          title: "Mobile web-app design",
-          status: "Listed",
+          id: "design",
+          title: "Design",
+          status: "On the sheet, no dates",
           items: [
             {
-              what: "The design list covers onboarding dashboard, loan, and insurance. Status was left blank on the sheet."
+              what: "Desktop web done: onboarding and dashboard, FatakUdaan, Refer & Earn, membership, settings, and calculator."
+            },
+            {
+              what: "Desktop web changes required: loan journey and insurance."
+            },
+            {
+              what: "Desktop web: coupons need an internal discussion."
+            },
+            {
+              what: "Mobile web-app design lists onboarding dashboard, loan, and insurance. Status was left blank."
             }
           ]
         }
       ]
     },
     {
-      id: "2026-08-24",
-      range: "24–30 August 2026",
-      title: "24–30 August",
-      label: "24 Aug",
-      summaryApp:
-        "App 6.20 stays live. App 6.21 is with QA, including a ₹149 repayment fix. Database migration was tested on an internal build, not a store release. UPI TPAP is in progress so users can pay inside the app after NPCI certification.",
-      summaryWeb:
-        "Website W4: SEO and journey fixes are live. Yubi GRO details, CIBIL-already-pulled handling, and DSA mobile search are built. Speed, About Us memberships, loan documents, webview lender flow, and app+web monorepo are still in progress.",
-      summaryAll:
-        "This week: app 6.20 is live, 6.21 is with QA, the database migration was tested internally, UPI TPAP is in progress, and website SEO/journey work is live with a few items built but not released.",
+      id: "2026-11-08",
+      month: "2026-11",
+      range: "2–8 Nov 2026",
+      label: "2 Nov",
+      summary: "PayU NACH is in progress on web and app. Timeline is 2 Nov. Dev started 30 Oct.",
       highlights: [
-        "App 6.20 is live on stores: campaign users skip home to Card or Personal Loan; home-load tracking; Credit Card/Gold swap; membership fix; Western Capital enabled.",
-        "App 6.21 is with QA, not on stores: more stable, smaller download, FatakLite EMI-again, Udaan score refresh, sanction status, membership banner, membership opt-in recorded, extra ₹149 repayment charge fixed.",
-        "Database migration: Saturday night internal build pointed at mig* servers for login, onboarding, and loan tests. Not a store release. APIs go back to live production. Store users are not on this build.",
-        "UPI TPAP: FatakPay in-app UPI (scan & pay, UPI ID, add bank). Registration is built. Not live until NPCI certification. Login SIM must be in the phone.",
-        "Web live: SEO 404s/duplicate titles, press articles, Refer & Earn heading, bank-details Next, edit-application permission, meta-keywords removed, DSA OTP skip where required.",
-        "Web built, not live: Yubi GRO on FDPL Finance, CIBIL-already-pulled handling, DSA search by mobile.",
-        "Web still in progress: mobile speed, About Us memberships, KFS/loan agreements, multi-lender webview (in QA), app+web monorepo."
+        "PayU NACH is in progress on web and app. Timeline 2 Nov. Dev started 30 Oct."
       ],
       sections: [
         {
-          id: "live",
-          stream: "app",
-          title: "Live on stores — app 6.20",
-          status: "Published",
+          id: "progress",
+          title: "In progress",
+          status: "In progress",
           items: [
             {
-              key: "FAT-1477",
-              what: "Campaign users skip the home dashboard and go straight to Card or Personal Loan, based on the link they opened."
-            },
-            {
-              key: "FAT-1463",
-              what: "We now track when the home dashboard actually loads, so marketing numbers are reliable."
-            },
-            {
-              key: "FAT-1462",
-              what: "On home, Credit Card and Gold tiles swapped places."
-            },
-            {
-              key: "FAT-1475",
-              what: "Membership screen fixed for a rare case that was breaking the flow."
-            },
-            {
-              key: "FAT-1476",
-              what: "Western Capital is enabled as a payment partner in the app."
-            }
-          ]
-        },
-        {
-          id: "build",
-          stream: "app",
-          title: "With QA — app 6.21",
-          status: "Not on stores yet",
-          items: [
-            {
-              key: "FAT-1527",
-              what: "App is more stable: crashes fixed on notifications, insurance, accepted offer, and UPI payment."
-            },
-            {
-              key: "FAT-1523",
-              what: "App is lighter: images compressed so the download is smaller."
-            },
-            {
-              key: "FAT-1494",
-              what: "Closed FatakLite EMI customers (small loan, paid on time) see a “take EMI again” banner on home and can apply without a bank statement."
-            },
-            {
-              key: "FAT-1521",
-              what: "Udaan users whose credit score was stuck at -1 can refresh it by confirming another mobile number."
-            },
-            {
-              key: "FAT-1520",
-              what: "After sanction, users see a clear status (pending, in progress, overdue, rejected) instead of a blank or wrong screen."
-            },
-            {
-              key: "FAT-1524",
-              what: "Membership banner added on the home carousel."
-            },
-            {
-              key: "FAT-1492",
-              what: "We now record whether the user opted in or out of membership during the loan journey."
-            },
-            {
-              key: "FAT-1526",
-              what: "Repayment on Card and EMI: extra ₹149 charge investigated and fixed."
-            }
-          ]
-        },
-        {
-          id: "migration",
-          stream: "app",
-          title: "Database migration — internal test",
-          status: "Not a store release",
-          items: [
-            {
-              key: "FAT-1532",
-              what: "Saturday night: an internal app build was pointed at the migration servers (mig*) so QA could test login, onboarding, and loan screens on the new database. This is not a Play Store or App Store release. After testing, APIs go back to live production. Store users are not on this build."
-            }
-          ]
-        },
-        {
-          id: "tpap",
-          stream: "app",
-          title: "UPI TPAP — in-app UPI",
-          status: "In progress, not live",
-          items: [
-            {
-              key: "FAT-1464",
-              what: "FatakPay is being set up as a TPAP so users can do UPI inside the app (scan & pay, create UPI ID, add bank, check balance, QR) without leaving to GPay or PhonePe."
-            },
-            {
-              key: "FTK-12728",
-              what: "Android SDK feasibility for TPAP is done."
-            },
-            {
-              key: "FTK-13764",
-              what: "Registration flow is built on the app: SIM verify, pick bank, link account. Users need the login SIM in the phone to register."
-            },
-            {
-              key: "FTK-12727",
-              what: "Not live yet. Add-bank, dashboard and profile UPI screens, and backend bank APIs are still open. A kill-switch will keep UPI hidden until NPCI certification."
-            }
-          ]
-        },
-        {
-          id: "web-live",
-          stream: "web",
-          title: "Live / monitoring",
-          status: "Live",
-          items: [
-            {
-              key: "FTWB-845",
-              what: "SEO: blog pagination 404s, a proper 404 page, and duplicate titles/descriptions cleaned up."
-            },
-            {
-              key: "FTWB-852",
-              what: "Press articles and thumbnails updated across the website."
-            },
-            {
-              key: "FTWB-851",
-              what: "Refer & Earn page heading (H1) updated."
-            },
-            {
-              key: "FTWB-849",
-              what: "Users can tap Next after bank details auto-fill — they were getting stuck."
-            },
-            {
-              key: "FTWB-866",
-              what: "Edit-application permission issue on production is fixed."
-            },
-            {
-              key: "FTWB-844",
-              what: "Old meta-keywords tag removed sitewide (in production monitoring)."
-            },
-            {
-              key: "FTWB-836",
-              what: "DSA self-registration on web can skip OTP where required (in production monitoring)."
-            }
-          ]
-        },
-        {
-          id: "web-built",
-          stream: "web",
-          title: "Built, not live yet",
-          status: "Dev done",
-          items: [
-            {
-              key: "FTWB-850",
-              what: "Yubi Markets GRO details added on the FDPL Finance website."
-            },
-            {
-              key: "FTWB-854",
-              what: "Web correctly handles users whose CIBIL report was already pulled."
-            },
-            {
-              key: "FTWB-872",
-              what: "DSA application list: search by mobile number works again."
-            }
-          ]
-        },
-        {
-          id: "web-wip",
-          stream: "web",
-          title: "Still in progress",
-          status: "In progress / QA",
-          items: [
-            {
-              key: "FTWB-843",
-              what: "Making the website faster on mobile (home and product pages load sooner)."
-            },
-            {
-              key: "FTWB-868",
-              what: "About Us: FatakPay shown as a proud member of IAMAI, FCC, and PCI."
-            },
-            {
-              key: "FTWB-873",
-              what: "KFS and loan agreement documents updated on web."
-            },
-            {
-              key: "FTWB-853",
-              what: "New multi-lender activation flow in webview (in QA)."
-            },
-            {
-              key: "FTWB-846",
-              what: "Monorepo setup so the app and website share one codebase (in progress)."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: "2026-08-17",
-      range: "17–23 August 2026",
-      title: "Last week",
-      label: "Previous",
-      summaryApp:
-        "App 6.20 is live. App 6.21 is with QA. An internal build was used to test the database migration.",
-      summaryWeb:
-        "Website W4: SEO and journey fixes are live. Speed, About Us memberships, webview lender flow, and app+web monorepo are still in progress.",
-      summaryAll:
-        "Last week: app 6.20 went live, 6.21 went to QA, the database migration was tested internally, and website SEO/journey fixes went live.",
-      highlights: [
-        "App 6.20 published: campaign skip-home, home-load tracking, Credit Card/Gold swap, membership fix, Western Capital.",
-        "App 6.21 given to QA: stability, smaller app, FatakLite EMI-again, Udaan score refresh, sanction status, membership banner and opt-in.",
-        "Database migration tested on an internal mig* build. Not a store release.",
-        "Web live: SEO, press, Refer & Earn heading, bank-details Next, edit-application fix, meta-keywords, DSA OTP skip."
-      ],
-      sections: [
-        {
-          id: "live",
-          stream: "app",
-          title: "Live on stores — app 6.20",
-          status: "Published",
-          items: [
-            {
-              key: "FAT-1477",
-              what: "Campaign users skip the home dashboard and go straight to Card or Personal Loan, based on the link they opened."
-            },
-            {
-              key: "FAT-1463",
-              what: "We now track when the home dashboard actually loads, so marketing numbers are reliable."
-            },
-            {
-              key: "FAT-1462",
-              what: "On home, Credit Card and Gold tiles swapped places."
-            },
-            {
-              key: "FAT-1475",
-              what: "Membership screen fixed for a rare case that was breaking the flow."
-            },
-            {
-              key: "FAT-1476",
-              what: "Western Capital is enabled as a payment partner in the app."
-            }
-          ]
-        },
-        {
-          id: "build",
-          stream: "app",
-          title: "Build given to QA — app 6.21",
-          status: "Not on stores yet",
-          items: [
-            {
-              key: "FAT-1527",
-              what: "App is more stable: crashes fixed on notifications, insurance, accepted offer, and UPI payment."
-            },
-            {
-              key: "FAT-1523",
-              what: "App is lighter: images compressed so the download is smaller."
-            },
-            {
-              key: "FAT-1494",
-              what: "Closed FatakLite EMI customers (small loan, paid on time) see a “take EMI again” banner on home and can apply without a bank statement."
-            },
-            {
-              key: "FAT-1521",
-              what: "Udaan users whose credit score was stuck at -1 can refresh it by confirming another mobile number."
-            },
-            {
-              key: "FAT-1520",
-              what: "After sanction, users see a clear status (pending, in progress, overdue, rejected) instead of a blank or wrong screen."
-            },
-            {
-              key: "FAT-1524",
-              what: "Membership banner added on the home carousel."
-            },
-            {
-              key: "FAT-1492",
-              what: "We now record whether the user opted in or out of membership during the loan journey."
-            }
-          ]
-        },
-        {
-          id: "migration",
-          stream: "app",
-          title: "Database migration — internal test",
-          status: "Not a store release",
-          items: [
-            {
-              key: "FAT-1532",
-              what: "An internal app build was pointed at the migration servers (mig*) so QA could test login, onboarding, and loan screens against the new database during Saturday night downtime. This build is not for Play Store or App Store. After testing, APIs go back to live production."
-            }
-          ]
-        },
-        {
-          id: "web-done",
-          stream: "web",
-          title: "Done this week",
-          status: "Live / monitoring",
-          items: [
-            {
-              key: "FTWB-845",
-              what: "SEO fixes on the website: blog pagination 404s, a proper 404 page, and duplicate titles/descriptions cleaned up."
-            },
-            {
-              key: "FTWB-852",
-              what: "Press articles and thumbnails updated across the website."
-            },
-            {
-              key: "FTWB-851",
-              what: "Refer & Earn page heading (H1) updated."
-            },
-            {
-              key: "FTWB-849",
-              what: "Users can tap Next after bank details auto-fill — they were getting stuck."
-            },
-            {
-              key: "FTWB-866",
-              what: "Edit-application permission issue on production is fixed."
-            },
-            {
-              key: "FTWB-844",
-              what: "Old meta-keywords tag removed sitewide (in production monitoring)."
-            },
-            {
-              key: "FTWB-836",
-              what: "DSA self-registration on web can skip OTP where required (in production monitoring)."
-            }
-          ]
-        },
-        {
-          id: "web-wip",
-          stream: "web",
-          title: "Still in progress",
-          status: "In progress / QA",
-          items: [
-            {
-              key: "FTWB-843",
-              what: "Making the website faster on mobile (home and product pages load sooner)."
-            },
-            {
-              key: "FTWB-868",
-              what: "About Us: FatakPay shown as a proud member of IAMAI, FCC, and PCI."
-            },
-            {
-              key: "FTWB-873",
-              what: "KFS and loan agreement documents updated on web."
-            },
-            {
-              key: "FTWB-854",
-              what: "Web correctly handles users whose CIBIL report was already pulled."
-            },
-            {
-              key: "FTWB-850",
-              what: "Yubi Markets GRO details added on the FDPL Finance website."
-            },
-            {
-              key: "FTWB-872",
-              what: "DSA application list: search by mobile number works again."
-            },
-            {
-              key: "FTWB-853",
-              what: "New multi-lender activation flow in webview (in QA)."
-            },
-            {
-              key: "FTWB-846",
-              what: "Monorepo setup so the app and website share one codebase (in progress)."
+              what: "Web and app: PayU NACH integration. Dev started 30 Oct. Timeline 2 Nov."
             }
           ]
         }
