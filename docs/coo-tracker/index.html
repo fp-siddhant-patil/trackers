@@ -283,7 +283,6 @@
       <button type="button" id="emailWeekBtn" class="btn-mail btn-mail-secondary">Email this week</button>
       <p id="emailStatus" class="email-status" role="status"></p>
     </div>
-    <div class="stats" id="stats"></div>
     <p class="summary" id="summary"></p>
     <div id="sections"></div>
     <p class="how">
@@ -354,10 +353,6 @@
       return data.weeks.find((week) => week.id === activeId) || weeksInMonth(activeMonth)[0] || data.weeks[0];
     }
 
-    function itemCount(week) {
-      return (week.pods || []).reduce((n, pod) => n + (pod.items ? pod.items.length : 0), 0);
-    }
-
     function itemLine(item) {
       const tag = item.security ? '<span class="sec">Security</span>' : "";
       return "<li>" + tag + item.what + (item.key ? " " + ticketLink(item.key) : "") + "</li>";
@@ -371,7 +366,6 @@
         blocks.push({
           id: pod.id === "design" ? "design" : "done",
           title: pod.title,
-          status: pod.items.length + (pod.items.length === 1 ? " update" : " updates"),
           items: pod.items
         });
       });
@@ -382,7 +376,6 @@
       return sections.map((section) => (
         '<section class="section" data-id="' + section.id + '">' +
           "<h2>" + section.title + "</h2>" +
-          '<div class="status">' + section.status + "</div>" +
           "<ul>" +
             (section.items || []).map(itemLine).join("") +
           "</ul>" +
@@ -402,14 +395,7 @@
       document.getElementById("tabs").innerHTML = weeksInMonth(activeMonth).map((week) => (
         '<button class="tab" role="tab" data-id="' + week.id + '" aria-selected="' + (week.id === activeId) + '">' +
           '<div class="when">' + week.range + "</div>" +
-          '<div class="meta">' + itemCount(week) + " updates</div>" +
         "</button>"
-      )).join("");
-    }
-
-    function renderStats(sections) {
-      document.getElementById("stats").innerHTML = sections.map((section) => (
-        '<div class="stat"><b>' + section.status + "</b><span>" + section.title + "</span></div>"
       )).join("");
     }
 
@@ -419,10 +405,6 @@
       document.getElementById("sections").innerHTML = sections.length
         ? htmlList(sections)
         : '<p class="empty">No updates in this week.</p>';
-      renderStats((week.pods || []).map((pod) => ({
-        title: pod.title,
-        status: String((pod.items || []).length)
-      })));
     }
 
     function weekLink(week) {
@@ -458,7 +440,6 @@
       const font = "Calibri,Arial,sans-serif";
       const pods = (week.pods || []).map((pod) => {
         if (!pod.items || !pod.items.length) return "";
-        const count = pod.items.length;
         const items = pod.items.map((item) => {
           const color = statusColor(item.status);
           const status = item.status
@@ -475,8 +456,7 @@
             head + esc(item.what) + key + "</p>";
         }).join("");
         return '<p style="margin:26px 0 0;padding:0 0 6px;border-bottom:2px solid #d5e8dc;font-family:' + font + ';font-size:18px;line-height:1.3;font-weight:bold;color:#111111;">' +
-          esc(pod.title) +
-          ' <span style="font-size:13px;font-weight:normal;color:#6d7f76;">' + count + (count === 1 ? " update" : " updates") + "</span></p>" +
+          esc(pod.title) + "</p>" +
           items;
       }).join("");
 
