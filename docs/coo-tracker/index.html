@@ -245,6 +245,11 @@
       font-weight: 700;
       cursor: pointer;
     }
+    .btn-mail-secondary {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid rgba(61, 214, 140, 0.7);
+    }
     .email-status { color: var(--muted); font-size: 0.88rem; }
     .how {
       margin-top: 1.6rem;
@@ -266,7 +271,7 @@
       <p class="team">Siddhant Team</p>
       <h1>Engineering <span>Tracker</span></h1>
       <p class="lede">
-        Pick the month, then the week. Email this week opens a mail with the pod update and a link to this page.
+        Pick the month, then the week. Send HTML in Outlook copies a formatted update and opens an Outlook draft with a link to this page.
       </p>
       <p class="updated" id="updated"></p>
     </header>
@@ -274,18 +279,19 @@
     <div class="months" id="months" role="tablist" aria-label="Months"></div>
     <div class="tabs" id="tabs" role="tablist" aria-label="Weeks"></div>
     <div class="share">
-      <button type="button" id="emailWeekBtn" class="btn-mail">Email this week</button>
+      <button type="button" id="outlookBtn" class="btn-mail">Send HTML in Outlook</button>
+      <button type="button" id="emailWeekBtn" class="btn-mail btn-mail-secondary">Email this week</button>
       <p id="emailStatus" class="email-status" role="status"></p>
     </div>
     <div class="stats" id="stats"></div>
     <p class="summary" id="summary"></p>
     <div id="sections"></div>
     <p class="how">
-      Email this week copies the update and opens your mail with the tracker link. If the mail draft is short, paste the copied update into the body.
+      Send HTML in Outlook copies the formatted mail and opens Outlook. Click the message, select all, then paste with Cmd+V, add people, and send. Email this week opens a plain-text draft in the default mail app.
     </p>
   </div>
 
-  <script src="data.js?v=2026-11-02-email"></script>
+  <script src="data.js?v=2026-11-02-outlook"></script>
   <script>
     const data = window.COO_TRACKER;
     if (!data || !data.weeks || !data.weeks.length) {
@@ -423,6 +429,93 @@
       return TRACKER_URL + "#" + encodeURIComponent(week.id);
     }
 
+    function esc(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function statusColor(status) {
+      const name = String(status || "").toLowerCase();
+      if (name === "done") return "#0f7a45";
+      if (name.indexOf("progress") !== -1) return "#1d4f91";
+      if (name.indexOf("not started") !== -1) return "#6b6256";
+      if (name.indexOf("change") !== -1) return "#8a5a00";
+      if (name.indexOf("discussion") !== -1) return "#5c3d8a";
+      return "#3d4f46";
+    }
+
+    function emailHtml(week) {
+      const link = weekLink(week);
+      const pods = (week.pods || []).map((pod) => {
+        if (!pod.items || !pod.items.length) return "";
+        const rows = (pod.items || []).map((item) => {
+          const security = item.security
+            ? '<span style="display:inline-block;background:#f5c451;color:#07110d;font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;border-radius:999px;padding:2px 8px;margin-right:6px;">Security</span>'
+            : "";
+          const key = item.key
+            ? ' <a href="' + esc(data.jiraBase + "/" + encodeURIComponent(item.key)) + '" style="color:#0b6b3a;font-weight:700;text-decoration:none;">' + esc(item.key) + "</a>"
+            : "";
+          const status = item.status
+            ? '<div style="margin-top:6px;font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:' + statusColor(item.status) + ';">' + esc(item.status) + "</div>"
+            : "";
+          return '<tr><td style="padding:12px 16px;border-top:1px solid #e4eee8;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.45;color:#14241c;">' +
+            security + esc(item.what) + key + status + "</td></tr>";
+        }).join("");
+        const summary = pod.summary
+          ? '<tr><td style="padding:0 8px 8px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.45;color:#3d5248;">' + esc(pod.summary) + "</td></tr>"
+          : "";
+        return '<tr><td style="padding:18px 8px 6px;font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:700;color:#07110d;">' + esc(pod.title) + "</td></tr>" +
+          summary +
+          '<tr><td style="padding:0 8px 8px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #d5e6dc;background:#ffffff;">' +
+            rows +
+          "</table></td></tr>";
+      }).join("");
+
+      return '<!DOCTYPE html><html><body style="margin:0;padding:0;background:#f3f7f4;">' +
+        "<!--StartFragment-->" +
+        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f7f4;"><tr><td align="center" style="padding:24px 12px;">' +
+        '<table role="presentation" width="640" cellpadding="0" cellspacing="0" style="width:100%;max-width:640px;">' +
+        '<tr><td style="background:#07110d;padding:28px 28px 22px;font-family:Arial,Helvetica,sans-serif;">' +
+        '<div style="font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#3dd68c;">Siddhant Team</div>' +
+        '<div style="margin-top:8px;font-size:28px;line-height:1.15;font-weight:700;color:#ffffff;">Engineering update</div>' +
+        '<div style="margin-top:8px;font-size:16px;color:#cfe6d8;">' + esc(week.range) + "</div>" +
+        "</td></tr>" +
+        '<tr><td style="background:#ffffff;padding:22px 20px 8px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#24362d;">' + esc(week.summary || "") + "</td></tr>" +
+        '<tr><td style="background:#ffffff;padding:8px 20px 4px;font-family:Arial,Helvetica,sans-serif;font-size:14px;"><a href="' + esc(link) + '" style="color:#0b6b3a;font-weight:700;">Open this week on the tracker</a></td></tr>' +
+        '<tr><td style="background:#ffffff;padding:8px 12px 24px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">' + pods + "</table></td></tr>" +
+        '<tr><td style="background:#07110d;padding:16px 28px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#93b0a2;">Siddhant Team engineering tracker</td></tr>' +
+        "</table></td></tr></table>" +
+        "<!--EndFragment-->" +
+        "</body></html>";
+    }
+
+    function outlookComposeUrl(subject, week) {
+      const note = "The formatted update is copied. Select all in this message and paste (Cmd+V).\n\nTracker: " + weekLink(week);
+      return "https://outlook.office.com/mail/deeplink/compose?subject=" +
+        encodeURIComponent(subject) + "&body=" + encodeURIComponent(note);
+    }
+
+    function downloadOutlookDraft(subject, html) {
+      const encodedSubject = "=?UTF-8?B?" + btoa(unescape(encodeURIComponent(subject))) + "?=";
+      const eml = [
+        "X-Unsent: 1",
+        "MIME-Version: 1.0",
+        "Content-Type: text/html; charset=UTF-8",
+        "Content-Transfer-Encoding: 8bit",
+        "Subject: " + encodedSubject,
+        "",
+        html
+      ].join("\r\n");
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(new Blob([eml], { type: "message/rfc822" }));
+      link.download = "siddhant-team-engineering-update.eml";
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
     function emailBody(week) {
       const lines = [
         "Siddhant Team — Engineering update",
@@ -457,6 +550,28 @@
       renderTabs();
       renderWeek(week);
     }
+
+    document.getElementById("outlookBtn").addEventListener("click", () => {
+      const week = activeWeek();
+      const subject = "Siddhant Team engineering update — " + week.range;
+      const html = emailHtml(week);
+      const status = document.getElementById("emailStatus");
+      const outlook = window.open(outlookComposeUrl(subject, week), "_blank");
+      const copy = navigator.clipboard && navigator.clipboard.write
+        ? navigator.clipboard.write([new ClipboardItem({
+            "text/html": new Blob([html], { type: "text/html" }),
+            "text/plain": new Blob([emailBody(week)], { type: "text/plain" })
+          })])
+        : Promise.reject();
+      copy.then(() => {
+        status.textContent = outlook
+          ? "HTML mail copied. In the Outlook draft, select all and paste with Cmd+V, then add people and send."
+          : "HTML mail copied. Allow pop-ups for Outlook, or open Outlook and paste with Cmd+V.";
+      }).catch(() => {
+        downloadOutlookDraft(subject, html);
+        status.textContent = "Outlook draft downloaded. Open that file in Outlook, add people, and send.";
+      });
+    });
 
     document.getElementById("emailWeekBtn").addEventListener("click", () => {
       const week = activeWeek();
