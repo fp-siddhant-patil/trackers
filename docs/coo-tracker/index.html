@@ -253,7 +253,7 @@
     </p>
   </div>
 
-  <script src="data.js?v=2026-11-02-week-pods"></script>
+  <script src="data.js?v=2026-11-02-pods-only"></script>
   <script>
     const data = window.COO_TRACKER;
     if (!data || !data.weeks || !data.weeks.length) {
@@ -325,25 +325,7 @@
 
     function podSections(week) {
       const pods = week.pods || [];
-      const security = [];
-      pods.forEach((pod) => {
-        (pod.items || []).forEach((item) => {
-          if (item.security) security.push(Object.assign({ pod: pod.title }, item));
-        });
-      });
       const blocks = [];
-      if (security.length) {
-        blocks.push({
-          id: "security",
-          title: "Security fixes",
-          status: "This week",
-          items: security.map((item) => ({
-            what: item.pod + ": " + item.what,
-            key: item.key,
-            security: true
-          }))
-        });
-      }
       pods.forEach((pod) => {
         if (!pod.items || !pod.items.length) return;
         blocks.push({
