@@ -1,87 +1,9 @@
-/* COO tracker from Weekly Reports.xlsx only.
-   Weeks are Monday–Sunday. A week with no dated rows is omitted. */
+/* COO tracker. Only the last October week from Weekly Reports.xlsx. */
 
 window.COO_TRACKER = {
   updated: "2026-11-02",
   jiraBase: "https://fatakpay.atlassian.net/browse",
   weeks: [
-    {
-      id: "2026-09-06",
-      month: "2026-09",
-      range: "31 Aug – 6 Sep 2026",
-      label: "1 Sep",
-      summary:
-        "GoDigit still shows a different final premium when the user goes to pay. Open since 1 Sep. Not started.",
-      highlights: [
-        "Insurance, GoDigit: the final premium shown before payment changes when the user goes to pay. Not started since 1 Sep."
-      ],
-      sections: [
-        {
-          id: "queued",
-          title: "Not started",
-          status: "Assigned",
-          items: [
-            {
-              what: "Insurance, GoDigit: the final premium shown before payment changes when the user goes to pay. Open since 1 Sep."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: "2026-10-18",
-      month: "2026-10",
-      range: "12–18 Oct 2026",
-      label: "16 Oct",
-      summary: "Reverse penny drop for UGRO Capital co-lending was updated on web.",
-      highlights: [
-        "Web done: reverse penny drop for UGRO Capital co-lending (16 Oct)."
-      ],
-      sections: [
-        {
-          id: "done",
-          title: "Done",
-          status: "Completed",
-          items: [
-            {
-              what: "Web: reverse penny drop for UGRO Capital co-lending is updated (16 Oct)."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: "2026-10-25",
-      month: "2026-10",
-      range: "19–25 Oct 2026",
-      label: "19 Oct",
-      summary:
-        "FatakUdaan page revamp and 60-second OTP resend on backend, web, and DSA were done. Insurance vehicle details stay in place on Cancel. The app OTP change was still open.",
-      highlights: [
-        "Web done: FatakUdaan page revamped to the design reference (23 Oct).",
-        "60-second OTP resend is done on backend, web, and DSA (23 Oct). The app change was still open.",
-        "Insurance: vehicle details stay in place when the user clicks Cancel (21 Oct)."
-      ],
-      sections: [
-        {
-          id: "done",
-          title: "Done",
-          status: "Completed",
-          items: [
-            {
-              what: "Web: FatakUdaan page revamped to the design reference (23 Oct)."
-            },
-            {
-              key: "FTK-14840",
-              what: "60-second OTP resend is done on backend, web, and DSA (23 Oct). The app change was still open."
-            },
-            {
-              what: "Insurance: vehicle details stay in place when the user clicks Cancel (21 Oct)."
-            }
-          ]
-        }
-      ]
-    },
     {
       id: "2026-11-01",
       month: "2026-10",
@@ -177,28 +99,6 @@ window.COO_TRACKER = {
             },
             {
               what: "Mobile web-app design lists onboarding dashboard, loan, and insurance. Status was left blank."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: "2026-11-08",
-      month: "2026-11",
-      range: "2–8 Nov 2026",
-      label: "2 Nov",
-      summary: "PayU NACH is in progress on web and app. Timeline is 2 Nov. Dev started 30 Oct.",
-      highlights: [
-        "PayU NACH is in progress on web and app. Timeline 2 Nov. Dev started 30 Oct."
-      ],
-      sections: [
-        {
-          id: "progress",
-          title: "In progress",
-          status: "In progress",
-          items: [
-            {
-              what: "Web and app: PayU NACH integration. Dev started 30 Oct. Timeline 2 Nov."
             }
           ]
         }
