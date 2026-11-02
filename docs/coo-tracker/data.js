@@ -3,7 +3,7 @@
    Then fill App/Web sections as usual. */
 
 window.COO_TRACKER = {
-  updated: "2026-08-24",
+  updated: "2026-11-02",
   jiraBase: "https://fatakpay.atlassian.net/browse",
   revamp: {
     title: "App revamp",
@@ -39,10 +39,159 @@ window.COO_TRACKER = {
   },
   weeks: [
     {
+      id: "2026-11-01",
+      range: "26 Oct – 1 Nov 2026",
+      title: "Last week",
+      label: "Latest",
+      summaryApp:
+        "Last week the Ignosis pass key and the compliance location-consent change were done. PayU NACH and PAN/DOB for account-aggregator consent were in progress. App OTP resend stayed in testing. JWT and in-app promotion had not started.",
+      summaryWeb:
+        "Last week DSA video KYC expiry and insurance payment retry were done. PayU NACH and PAN/DOB consent were in progress. Two insurance items were ready for QA. Coupon code was still waiting on JWT.",
+      summaryAll:
+        "Last week: Ignosis pass key and location consent were done on the app, DSA video KYC expiry and insurance payment retry were done on web, and PayU NACH plus PAN/DOB consent were in progress on both.",
+      highlights: [
+        "App done: Ignosis pass key (29 Oct), and location consent updated for compliance (28 Oct).",
+        "Web done: DSA video KYC link can be expired from admin (29 Oct). Insurance users can pay again after a failed payment (28–29 Oct).",
+        "PayU NACH started on web and app on 30 Oct. Timeline is 2 Nov.",
+        "PAN and DOB for account-aggregator consent (Ignosis, FinFactor, FinBox, CAMS) were in sanity and testing. Deadline was 31 Oct.",
+        "Insurance ready for QA: IDV/NCB dropdown opens only on the control itself (27 Oct), and net premium is on the breakup (30 Oct).",
+        "App OTP resend (FTK-14840) was still in testing. Web and DSA OTP resend had already shipped the week before.",
+        "Still open: web coupon code waiting on JWT, Diwali website banners (dev started, timeline 31 Oct), app JWT, in-app promotion, and NCB prefill on repeat login (29 Oct).",
+        "Desktop design on the report: onboarding and dashboard, FatakUdaan, Refer & Earn, membership, settings, and calculator are done. Loan journey and insurance need changes. Coupons need an internal discussion."
+      ],
+      sections: [
+        {
+          id: "web-live",
+          stream: "web",
+          title: "Web — done last week",
+          status: "Done",
+          items: [
+            {
+              what: "DSA video KYC link can be expired from admin (29 Oct)."
+            },
+            {
+              what: "Insurance: after a payment fails, the user can pay again (28–29 Oct)."
+            }
+          ]
+        },
+        {
+          id: "web-wip",
+          stream: "web",
+          title: "Web — in progress",
+          status: "In progress / QA",
+          items: [
+            {
+              what: "PayU NACH integration. Dev started 30 Oct. Timeline 2 Nov."
+            },
+            {
+              what: "PAN and DOB are passed in the account-aggregator consent request (Ignosis, FinFactor, FinBox, CAMS). Sanity and testing are in progress. Deadline was 31 Oct."
+            },
+            {
+              what: "Insurance, ready for QA: the IDV or NCB dropdown on plan selection opens only when the dropdown itself is clicked, not the area beside it."
+            },
+            {
+              what: "Insurance, ready for QA: net premium is added on the premium breakup from the quotes summary API."
+            }
+          ]
+        },
+        {
+          id: "web-queued",
+          stream: "web",
+          title: "Web — not started",
+          status: "Assigned",
+          items: [
+            {
+              what: "Web coupon code is waiting on JWT confirmation. Timeline is not set."
+            },
+            {
+              what: "Diwali campaign banners on the website. Dev has started. Timeline was 31 Oct."
+            },
+            {
+              what: "Insurance: logging in again with the same vehicle number does not show the prefilled NCB percentage (29 Oct)."
+            }
+          ]
+        },
+        {
+          id: "web-design",
+          stream: "web",
+          title: "Desktop web design",
+          status: "Design report",
+          items: [
+            {
+              what: "Done: onboarding and dashboard, FatakUdaan, Refer & Earn, membership, settings, and calculator."
+            },
+            {
+              what: "Changes required: loan journey and insurance."
+            },
+            {
+              what: "Coupons need an internal discussion."
+            }
+          ]
+        },
+        {
+          id: "live",
+          stream: "app",
+          title: "App — done last week",
+          status: "Done",
+          items: [
+            {
+              what: "Ignosis pass key is done."
+            },
+            {
+              what: "Location consent updated for compliance."
+            }
+          ]
+        },
+        {
+          id: "build",
+          stream: "app",
+          title: "App — in progress",
+          status: "In progress",
+          items: [
+            {
+              what: "PayU NACH integration. Dev started 30 Oct. Timeline 2 Nov."
+            },
+            {
+              what: "PAN and DOB are passed in the account-aggregator consent request (Ignosis, FinFactor, FinBox, CAMS). Sanity and testing are in progress. Deadline was 31 Oct."
+            },
+            {
+              key: "FTK-14840",
+              what: "60-second OTP resend on the app journey is in testing."
+            }
+          ]
+        },
+        {
+          id: "app-queued",
+          stream: "app",
+          title: "App — not started",
+          status: "Assigned",
+          items: [
+            {
+              what: "JWT on the app frontend. Timeline is not set."
+            },
+            {
+              what: "In-app promotion. No timeline on the sheet."
+            }
+          ]
+        },
+        {
+          id: "app-design",
+          stream: "app",
+          title: "Mobile web-app design",
+          status: "Listed",
+          items: [
+            {
+              what: "The design list covers onboarding dashboard, loan, and insurance. Status was left blank on the sheet."
+            }
+          ]
+        }
+      ]
+    },
+    {
       id: "2026-08-24",
       range: "24–30 August 2026",
-      title: "This week",
-      label: "Latest",
+      title: "24–30 August",
+      label: "24 Aug",
       summaryApp:
         "App 6.20 stays live. App 6.21 is with QA, including a ₹149 repayment fix. Database migration was tested on an internal build, not a store release. UPI TPAP is in progress so users can pay inside the app after NPCI certification.",
       summaryWeb:
